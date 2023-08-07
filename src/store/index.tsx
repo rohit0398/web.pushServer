@@ -1,10 +1,12 @@
-import { useDispatch, useSelector } from "react-redux";
-import type { TypedUseSelectorHook } from "react-redux";
-import {Action} from 'redux';
-import { configureStore, ThunkAction } from "@reduxjs/toolkit";
-import { createWrapper } from "next-redux-wrapper";
+/* eslint-disable import/no-named-as-default */
+import type { ThunkAction } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import { createWrapper } from 'next-redux-wrapper';
+import type { TypedUseSelectorHook } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import type { Action } from 'redux';
 
-import utilSlice from "./utilSlice";
+import utilSlice from './utilSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,7 +24,12 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action
+>;
 export type AppStore = ReturnType<typeof makeStore>;
 
 export const wrapper = createWrapper<AppStore>(makeStore);

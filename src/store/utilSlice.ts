@@ -1,12 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { HYDRATE } from "next-redux-wrapper";
+/* eslint-disable import/no-named-as-default */
+/* eslint-disable no-param-reassign */
+
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { HYDRATE } from 'next-redux-wrapper';
+
 import {
   fetchAllCategoriesAction,
   fetchAllCountriesAction,
   fetchAllIndustriesAction,
   fetchAllStagesAction,
   fetchSeachFilterAction,
-} from "./actions/untilActions";
+} from './actions/untilActions';
 
 export type ICountry = { value: string; name: string; code: string };
 export type ICategory = { value: string; name: string };
@@ -42,7 +47,7 @@ const initialState: IState = {
   notFound: false,
 };
 export const utilSlice = createSlice({
-  name: "util",
+  name: 'util',
   initialState,
   reducers: {
     setReducerLoading: (state, action: PayloadAction<boolean>) => {
@@ -59,50 +64,38 @@ export const utilSlice = createSlice({
 
     builder.addCase(fetchAllCountriesAction.fulfilled, (state, action) => {
       state.countries = [
-        { value: "all", name: "all" },
+        { value: 'all', name: 'all' },
         ...action.payload.map((val: any) => {
           return { value: String(val.id), name: val.name, code: val.code };
         }),
       ] as any;
     });
-    builder.addCase(fetchAllCountriesAction.rejected, () => {
-      console.log("Api failed");
-    });
 
     builder.addCase(fetchAllCategoriesAction.fulfilled, (state, action) => {
       state.categories = [
-        { value: "all", name: "all" },
+        { value: 'all', name: 'all' },
         ...action.payload.map((val: any) => {
           return { value: String(val.id), name: val.name };
         }),
       ] as any;
-    });
-    builder.addCase(fetchAllCategoriesAction.rejected, () => {
-      console.log("Api failed");
     });
 
     builder.addCase(fetchAllStagesAction.fulfilled, (state, action) => {
       state.stages = [
-        { value: "all", name: "all" },
+        { value: 'all', name: 'all' },
         ...action.payload.map((val: any) => {
           return { value: String(val.id), name: val.name };
         }),
       ] as any;
-    });
-    builder.addCase(fetchAllStagesAction.rejected, () => {
-      console.log("Api failed");
     });
 
     builder.addCase(fetchAllIndustriesAction.fulfilled, (state, action) => {
       state.industries = [
-        { value: "all", name: "all" },
+        { value: 'all', name: 'all' },
         ...action.payload.map((val: any) => {
           return { value: String(val.id), name: val.name };
         }),
       ] as any;
-    });
-    builder.addCase(fetchAllIndustriesAction.rejected, () => {
-      console.log("Api failed");
     });
 
     builder.addCase(fetchSeachFilterAction.fulfilled, (state, action) => {

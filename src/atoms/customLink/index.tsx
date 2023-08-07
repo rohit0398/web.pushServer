@@ -1,13 +1,17 @@
-import { forwardRef, ReactNode } from "react";
-import Link from "next/link";
+/* eslint-disable react/display-name */
+/* eslint-disable react/no-children-prop */
+
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { forwardRef } from 'react';
 
 const AnchorTag = forwardRef(
   (
     {
       onClick,
       href,
-      text = "",
-      className = "text-white text-base font-semibold underline text-center",
+      text = '',
+      className = 'text-white text-base font-semibold underline text-center',
       children,
     }: {
       onClick?: any;
@@ -16,7 +20,7 @@ const AnchorTag = forwardRef(
       className?: string;
       children?: ReactNode;
     },
-    ref: any
+    ref: any,
   ) => {
     return (
       <a className={className} href={href} onClick={onClick} ref={ref}>
@@ -24,7 +28,7 @@ const AnchorTag = forwardRef(
         {text}
       </a>
     );
-  }
+  },
 );
 
 export function CustomLink({

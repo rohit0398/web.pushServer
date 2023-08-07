@@ -1,13 +1,21 @@
-import React from "react";
+import React from 'react';
 
-export function CustomCheckbox({ label, name, register }:{label?: string, name: string, register: any}) {
+export function CustomCheckbox({
+  label,
+  name,
+  register,
+}: {
+  label?: string;
+  name: string;
+  register: any;
+}) {
   return (
-    <label className="flex items-center mt-3">
+    <label className="mt-3 flex items-center">
       <input
         type="checkbox"
         name={name}
-        className="h-5 w-5 form-checkbox text-dark-purple focus:ring-dark-purple border-gray rounded"
-        {...register(name)} 
+        className="form-checkbox h-5 w-5 rounded border-gray text-dark-purple focus:ring-dark-purple"
+        {...register(name)}
       />
       <span className="ml-2 text-gray">{label}</span>
     </label>

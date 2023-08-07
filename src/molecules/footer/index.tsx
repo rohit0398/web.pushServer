@@ -1,13 +1,5 @@
 import { useRouter } from 'next/router';
 
-import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkdinIcon,
-  LogoWhiteIcon,
-  TwitterIcon,
-} from '@/public/assets/svg-icons';
-
 export function Footer() {
   const { push } = useRouter();
   return (
@@ -27,9 +19,9 @@ export function Footer() {
           <span className="">
             Language: <span className=" cursor-pointer">ENG</span>
           </span>
-          <div className=" flex cursor-pointer justify-between gap-1">
+          {/* <div className=" flex cursor-pointer justify-between gap-1">
             <LinkdinIcon /> <InstagramIcon /> <FacebookIcon /> <TwitterIcon />
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -37,7 +29,7 @@ export function Footer() {
         onClick={() => push('/')}
         className=" mt-3 flex cursor-pointer items-center gap-3 px-5 pb-6 text-white"
       >
-        <LogoWhiteIcon />
+        {/* <LogoWhiteIcon /> */}
         <div className=" flex flex-col">
           <span className=" text-xl font-normal leading-4">startups</span>
           <span className=" text-xl font-bold">galaxy</span>

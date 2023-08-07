@@ -1,49 +1,35 @@
-import React, { useEffect, useState } from "react";
-import Select, { OptionsType, ValueType } from "react-select";
-import {
-  DeepMap,
-  FieldError,
-  FieldValues,
-} from "react-hook-form";
+import React, { useEffect, useState } from 'react';
+import type { Props as SelectProps } from 'react-select';
+import Select from 'react-select';
 
-interface MultiSelectSearchProps<T> {
-  options: OptionsType<T>;
+interface MultiSelectSearchProps<Option> {
+  options: SelectProps<Option>['options'];
   name: string;
   label: string;
   register: any;
-  error: DeepMap<FieldValues, FieldError>;
+  error: any;
 }
-
-const MultiSelectSearch = <T extends { label: string; value: string }>({
+const MultiSelectSearch = <Option extends { label: string; value: string }>({
   options,
   name,
   label,
   register,
   error,
-}: MultiSelectSearchProps<T>) => {
-  const [selectedOptions, setSelectedOptions] = useState<ValueType<T>>([]);
+}: MultiSelectSearchProps<Option>) => {
+  const [selectedOptions, setSelectedOptions] = useState<
+    SelectProps<Option>['value']
+  >([]);
 
   useEffect(() => {
     register(name);
   }, [register, name]);
-  const handleChange = (selected: ValueType<T>) => {
+  const handleChange = (selected: SelectProps<Option>['value']) => {
     setSelectedOptions(selected);
-    console.log(
-      "register",
-      register(name).onChange({
-        target: {
-          name: name,
-          value: selected,
-        },
-      }),
-      selected
-    );
-    // register(name)?.onChange(selected);
   };
 
   return (
     <div className="mb-4">
-      <label htmlFor={name} className="form-label text-medium-gray font-medium mb-2">
+      <label htmlFor={name} className=" mb-2 font-medium text-medium-gray">
         {label}
       </label>
       <Select
@@ -54,8 +40,8 @@ const MultiSelectSearch = <T extends { label: string; value: string }>({
         name={name}
         inputId={name}
         instanceId={name}
-        className={`rounded-md shadow-sm focus:ring focus:ring-opacity-50 ${
-          error?.[name] ? "border-red-500" : "border-light-gray"
+        className={`rounded-md shadow-sm focus:ring ${
+          error?.[name] ? 'border-red-500' : 'border-light-gray'
         }`}
       />
       {error?.[name] && (

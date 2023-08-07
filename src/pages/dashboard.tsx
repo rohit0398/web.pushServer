@@ -1,4 +1,3 @@
-import { Layout } from "@/layouts";
 import {
   Bar,
   BarChart,
@@ -8,49 +7,52 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
+} from 'recharts';
+
+import { Layout } from '@/layouts';
+
 const segmentHeading = `text-xl font-semibold text-gray`;
 
 export default function Dashboard() {
   const data = [
     {
-      name: "07/07/23",
+      name: '07/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "08/07/23",
+      name: '08/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "09/07/23",
+      name: '09/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "10/07/23",
+      name: '10/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "11/07/23",
+      name: '11/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "12/07/23",
+      name: '12/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
     },
     {
-      name: "13/07/23",
+      name: '13/07/23',
       subscriptions: 5,
       unsubscriptions: 2,
       inactivations: 1,
@@ -59,7 +61,7 @@ export default function Dashboard() {
 
   const data2 = [
     {
-      name: "07/07/23",
+      name: '07/07/23',
       LPClicks: 5,
       Leads: 2,
       Clicked: 1,
@@ -68,7 +70,7 @@ export default function Dashboard() {
       Sent: 1,
     },
     {
-      name: "08/07/23",
+      name: '08/07/23',
       LPClicks: 5,
       Leads: 2,
       Clicked: 1,
@@ -77,7 +79,7 @@ export default function Dashboard() {
       Sent: 1,
     },
     {
-      name: "09/07/23",
+      name: '09/07/23',
       LPClicks: 5,
       Leads: 2,
       Clicked: 1,
@@ -86,7 +88,7 @@ export default function Dashboard() {
       Sent: 1,
     },
     {
-      name: "10/07/23",
+      name: '10/07/23',
       LPClicks: 5,
       Leads: 2,
       Clicked: 1,
@@ -98,34 +100,34 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className=" w-full mb-5 p-3 sm:p-10 pb-10 bg-stroke-light-gray h-full overflow-y-auto">
-        <div className=" bg-white rounded-2xl p-3 sm:p-10 relative">
-          <h2 className="text-3xl font-semibold text-gray mb-16">Dashboard</h2>
+      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+        <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
+          <h2 className="mb-16 text-3xl font-semibold text-gray">Dashboard</h2>
 
           <h5 className={segmentHeading}>Push subscriptions</h5>
-          <hr className="border-t mt-1" />
+          <hr className="mt-1 border-t" />
 
-          <div className=" mt-5 mb-8">
-            <div className=" grid grid-cols-3 gap-5 mb-4">
+          <div className=" mb-8 mt-5">
+            <div className=" mb-4 grid grid-cols-3 gap-5">
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Active subscriptions
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Last 14 days (Unsub.%)
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   On the last active day (Unsub., %)
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
             </div>
             <div className=" h-96 w-full">
@@ -156,51 +158,51 @@ export default function Dashboard() {
 
           <div className=" mt-16">
             <h5 className={segmentHeading}>Campaigns</h5>
-            <hr className="border-t mt-1" />
+            <hr className="mt-1 border-t" />
           </div>
 
-          <div className=" mt-5 mb-8">
-            <div className=" grid grid-cols-3 gap-5 mb-4">
+          <div className=" mb-8 mt-5">
+            <div className=" mb-4 grid grid-cols-3 gap-5">
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Sent in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Shown in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Clicked in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Closed in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   LPClicks in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
 
               <div>
-                <div className=" text-light-gray font-semibold">
+                <div className=" font-semibold text-light-gray">
                   Leads in the last 14 days
                 </div>
-                <div className=" font-semibold text-base">0</div>
+                <div className=" text-base font-semibold">0</div>
               </div>
             </div>
             <div className=" h-96 w-full">

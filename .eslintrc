@@ -68,7 +68,8 @@
         "iterators/generators": "off",
         "@typescript-eslint/no-use-before-define": "off",
         "no-unsafe-optional-chaining": "off",
-        "no-nested-ternary": "off"
+        "no-nested-ternary": "off",
+        "@typescript-eslint/no-throw-literal": "off"
       }
     },
     // Configuration for testing

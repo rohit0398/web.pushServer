@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-type IButtonVarient = "filled" | "transparent" | "out-lined";
+type IButtonVarient = 'filled' | 'transparent' | 'out-lined';
 
 type IProps = {
   title: string | ReactNode;
@@ -17,32 +17,32 @@ type IProps = {
 export function Button({
   title,
   disabled = false,
-  size = "h-10",
-  paddingMargin = "px-5 lg:px-8",
-  variant = "filled",
-  fontSize = "text-sm lg:text-base lg:font-bold",
-  className = "",
+  size = 'h-10',
+  paddingMargin = 'px-5 lg:px-8',
+  variant = 'filled',
+  fontSize = 'text-sm lg:text-base lg:font-bold',
+  className = '',
   onClick,
-  rounded = "rounded lg:rounded-lg",
-  type = "button",
+  rounded = 'rounded lg:rounded-lg',
+  type = 'button',
 }: IProps) {
   function buttonVarient(uiVarient: IButtonVarient) {
     switch (uiVarient) {
-      case "filled":
+      case 'filled':
         return ` bg-dark-purple text-white text-center ${rounded} ${className} ${size} ${paddingMargin} ${fontSize} ${
-          disabled ? "opacity-40 cursor-not-allowed" : ""
+          disabled ? 'opacity-40 cursor-not-allowed' : ''
         }`;
-      case "transparent":
+      case 'transparent':
         return `bg-transparent text-dark-purple text-center ${rounded} ${className} ${size} ${paddingMargin} ${fontSize} ${
-          disabled ? "opacity-40 cursor-not-allowed" : ""
+          disabled ? 'opacity-40 cursor-not-allowed' : ''
         }`;
-      case "out-lined":
+      case 'out-lined':
         return `bg-transparent text-dark-purple text-center ${rounded} border border-dark-purple ${className} ${size} ${paddingMargin} ${fontSize} ${
-          disabled ? "opacity-40 cursor-not-allowed" : ""
+          disabled ? 'opacity-40 cursor-not-allowed' : ''
         }`;
       default:
         return ` bg-dark-purple text-white text-center ${rounded} ${className} ${size} ${paddingMargin} ${fontSize} ${
-          disabled ? "opacity-40 cursor-not-allowed" : ""
+          disabled ? 'opacity-40 cursor-not-allowed' : ''
         }`;
     }
   }

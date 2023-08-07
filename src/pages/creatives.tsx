@@ -1,14 +1,13 @@
-import React, { useCallback, useState } from "react";
-import { Crop } from "react-image-crop";
-import { Button, InputField, Modal } from "@/atoms";
-import { getCroppedCanvas } from "@/utils/helper";
-import { useForm } from "react-hook-form";
-import ReusableReactCrop from "@/molecules/imageCrop";
-import { Table, tableDataType } from "@/atoms/table/table";
-import { ColumnDef, createColumnHelper, FilterFn } from "@tanstack/react-table";
-import { Layout } from "@/layouts";
+import type { ColumnDef } from '@tanstack/react-table';
+import React, { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import type { Crop } from 'react-image-crop';
 
-const columnHelper = createColumnHelper<tableDataType>();
+import { Button, InputField, Modal } from '@/atoms';
+import { CustomTable } from '@/atoms/table/table';
+import { Layout } from '@/layouts';
+import ReusableReactCrop from '@/molecules/imageCrop';
+import { getCroppedCanvas } from '@/utils/helper';
 
 type FormData = {
   previewImage: FileList;
@@ -18,15 +17,6 @@ type FormData = {
 interface ImageState {
   selectedFile: File | undefined;
   imgSrc: string | ArrayBuffer | null;
-}
-
-// Define the data type for each row
-interface TableDataRow {
-  ID: number;
-  Title: string;
-  Status: string;
-  Countries: string[];
-  Feeds: string[];
 }
 
 export default function AddCreative() {
@@ -40,9 +30,9 @@ export default function AddCreative() {
     imgSrc: null,
   });
 
-  const { register, handleSubmit, formState, watch } = useForm<FormData>();
-  const previewImg = watch("previewImage");
-  const bodyImg = watch("bodyImage");
+  const { register, handleSubmit, formState } = useForm<FormData>();
+  // const previewImg = watch('previewImage');
+  // const bodyImg = watch('bodyImage');
 
   const handleCropComplete = useCallback(
     async (crop: Crop, isPreviewImage: boolean) => {
@@ -52,18 +42,18 @@ export default function AddCreative() {
         image.src = imagesState.imgSrc as string;
 
         image.onload = async () => {
-          const imageBlob = await getCroppedCanvas(image, crop, "image/png");
-          console.log("blo", imageBlob);
+          const imageBlob = await getCroppedCanvas(image, crop, 'image/png');
           if (imageBlob) {
-            const file = new File([imageBlob], "cropped-image.png", {
-              type: "image/png",
+            const file = new File([imageBlob], 'cropped-image.png', {
+              type: 'image/png',
             });
-            console.log("file", file);
+            /* eslint-disable-next-line no-console */
+            console.log('file', file);
           }
         };
       }
     },
-    [images, bodyImages]
+    [images, bodyImages],
   );
 
   const handleFileSelect = useCallback(
@@ -72,7 +62,7 @@ export default function AddCreative() {
       if (event.target.files && event.target.files.length > 0) {
         const file = event.target.files[0];
         const reader = new FileReader();
-        reader.addEventListener("load", () =>
+        reader.addEventListener('load', () =>
           isPreviewImage
             ? setImages({
                 ...imagesState,
@@ -83,90 +73,89 @@ export default function AddCreative() {
                 ...imagesState,
                 selectedFile: file,
                 imgSrc: reader.result?.toString() || null,
-              })
+              }),
         );
         reader.readAsDataURL(file as File);
       }
     },
-    [images, bodyImages]
+    [images, bodyImages],
   );
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (_data: FormData) => {
     // Handle file submission here
-    console.log(data);
   };
 
   const data = [
     {
-      title: "Angela",
-      tags: ["ahfhd", "rohit"],
-      id: "13",
-      status: "single",
+      title: 'Angela',
+      tags: ['ahfhd', 'rohit'],
+      id: '13',
+      status: 'single',
     },
     {
-      title: "Madisen",
-      tags: ["ahfhd", "rohit"],
-      id: "75",
-      status: "relationship",
+      title: 'Madisen',
+      tags: ['ahfhd', 'rohit'],
+      id: '75',
+      status: 'relationship',
     },
     {
-      title: "Clair",
-      tags: ["ahfhd", "rohit"],
-      id: "56",
-      status: "single",
+      title: 'Clair',
+      tags: ['ahfhd', 'rohit'],
+      id: '56',
+      status: 'single',
     },
     {
-      title: "Emilia",
-      tags: ["ahfhd", "21rohit21"],
-      id: "20",
-      status: "relationship",
+      title: 'Emilia',
+      tags: ['ahfhd', '21rohit21'],
+      id: '20',
+      status: 'relationship',
     },
     {
-      title: "Domenic",
-      tags: ["ahfhd", "21rohit21"],
-      id: "91",
-      status: "complicated",
+      title: 'Domenic',
+      tags: ['ahfhd', '21rohit21'],
+      id: '91',
+      status: 'complicated',
     },
   ];
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: "id",
-        header: "ID",
-        filterFn: "includesString",
+        accessorKey: 'id',
+        header: 'ID',
+        filterFn: 'includesString',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "campaignId",
-        header: "Campaign ID",
-        filterFn: "includesString",
+        accessorKey: 'campaignId',
+        header: 'Campaign ID',
+        filterFn: 'includesString',
       },
       {
-        accessorKey: "title",
-        header: "Title",
-        filterFn: "includesString",
+        accessorKey: 'title',
+        header: 'Title',
+        filterFn: 'includesString',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "body",
-        header: "Body",
+        accessorKey: 'body',
+        header: 'Body',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "tags",
-        header: "Tags",
+        accessorKey: 'tags',
+        header: 'Tags',
         accessorFn: (row) => {
-          return row?.tags?.join(",");
+          return row?.tags?.join(',');
         },
         cell: (info) => {
           const val = info?.getValue() as string;
-          const arr = val?.split(",");
+          const arr = val?.split(',');
           return (
             <div className=" flex gap-x-1">
-              {arr.map((val, ind) => (
-                <span key={ind} className=" bg-light-blue p-1 rounded">
-                  {val}
+              {arr.map((ele, ind) => (
+                <span key={ind} className=" rounded bg-light-blue p-1">
+                  {ele}
                 </span>
               ))}
             </div>
@@ -174,39 +163,39 @@ export default function AddCreative() {
         },
       },
       {
-        accessorKey: "random",
-        header: "Random",
+        accessorKey: 'random',
+        header: 'Random',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "data",
-        header: "Data",
+        accessorKey: 'data',
+        header: 'Data',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "previewImage",
-        header: "Preview Image",
+        accessorKey: 'previewImage',
+        header: 'Preview Image',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "bodyImage",
-        header: "Body Image",
+        accessorKey: 'bodyImage',
+        header: 'Body Image',
         enableColumnFilter: false,
       },
     ],
-    []
+    [],
   );
 
   return (
     <Layout>
-      <div className=" w-full mb-5 p-3 sm:p-10 pb-10 bg-stroke-light-gray h-full overflow-y-auto">
-        <div className=" bg-white rounded-2xl p-3 sm:p-10">
-          <div className=" flex justify-between mb-8">
+      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+        <div className=" rounded-2xl bg-white p-3 sm:p-10">
+          <div className=" mb-8 flex justify-between">
             <div className=" text-3xl font-semibold text-gray">Create</div>
             <Button title="creative" onClick={() => setShowModal(true)} />
           </div>
 
-          <Table columns={columns} data={data} />
+          <CustomTable columns={columns} data={data} />
 
           <Modal
             open={showModal}
@@ -214,7 +203,7 @@ export default function AddCreative() {
             width="sm:max-w-4xl sm:w-full max-h-[calc(100vh-4rem)] overflow-y-auto scroll-thin"
           >
             <div className="flex flex-col">
-              <div className="text-2xl self-start font-semibold text-gray">
+              <div className="self-start text-2xl font-semibold text-gray">
                 Add creative
               </div>
               <div className="mt-8">
@@ -222,15 +211,15 @@ export default function AddCreative() {
                   {/* Upload Preview Image */}
                   <div className="flex justify-between">
                     <div className="">
-                      <div className="text-gray text-base font-semibold">
+                      <div className="text-base font-semibold text-gray">
                         Upload Preview Image
                       </div>
-                      <div className="text-light-gray text-sm font-semibold text-start">
+                      <div className="text-start text-sm font-semibold text-light-gray">
                         Size: 196x196px
                       </div>
                     </div>
 
-                    <div className="form-control">
+                    <div className="">
                       <InputField
                         type="file"
                         id="previewImage"
@@ -242,12 +231,12 @@ export default function AddCreative() {
                         required
                         validate={{
                           fileFormat: (value: any) =>
-                            ["image/jpeg", "image/png"].includes(
-                              value[0]?.type
-                            ) || "Unsupported file format",
+                            ['image/jpeg', 'image/png'].includes(
+                              value[0]?.type,
+                            ) || 'Unsupported file format',
                           fileSize: (value: any) =>
                             value[0]?.size < 1024 * 1024 * 5 ||
-                            "File size exceeds 5MB",
+                            'File size exceeds 5MB',
                         }}
                         onChange={(e) => handleFileSelect(e, true)}
                       />
@@ -271,15 +260,15 @@ export default function AddCreative() {
                   {/* Upload Body Image */}
                   <div className="flex justify-between">
                     <div className="">
-                      <div className="text-gray text-base font-semibold">
+                      <div className="text-base font-semibold text-gray">
                         Upload Body Image
                       </div>
-                      <div className="text-light-gray text-sm font-semibold text-start">
+                      <div className="text-start text-sm font-semibold text-light-gray">
                         Size: 492x328px
                       </div>
                     </div>
 
-                    <div className="form-control">
+                    <div className="">
                       <InputField
                         type="file"
                         id="bodyImage"
@@ -291,12 +280,12 @@ export default function AddCreative() {
                         required
                         validate={{
                           fileFormat: (value: any) =>
-                            ["image/jpeg", "image/png"].includes(
-                              value[0]?.type
-                            ) || "Unsupported file format",
+                            ['image/jpeg', 'image/png'].includes(
+                              value[0]?.type,
+                            ) || 'Unsupported file format',
                           fileSize: (value: any) =>
                             value[0]?.size < 1024 * 1024 * 5 ||
-                            "File size exceeds 5MB",
+                            'File size exceeds 5MB',
                         }}
                         onChange={(e) => handleFileSelect(e, false)}
                       />
@@ -317,7 +306,7 @@ export default function AddCreative() {
                     )}
                   </div>
 
-                  <div className=" flex flex-col gap-3 max-w-[25rem] ml-auto">
+                  <div className=" ml-auto flex max-w-[25rem] flex-col gap-3">
                     <div className=" flex flex-col">
                       <InputField
                         label="Title"
@@ -326,11 +315,11 @@ export default function AddCreative() {
                         register={register}
                         formState={formState}
                         rules={{
-                          required: "This is a required field.",
+                          required: 'This is a required field.',
                         }}
                       />
-                      <span className=" text-left mr-auto self-start place-self-start text-light-gray text-sm">
-                        {String("{city},{regionName}")}
+                      <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
+                        {String('{city},{regionName}')}
                       </span>
                     </div>
 
@@ -342,8 +331,8 @@ export default function AddCreative() {
                         register={register}
                         formState={formState}
                       />
-                      <span className=" text-left mr-auto self-start place-self-start text-light-gray text-sm">
-                        {String("{city},{regionName}")}
+                      <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
+                        {String('{city},{regionName}')}
                       </span>
                     </div>
 
@@ -355,13 +344,13 @@ export default function AddCreative() {
                         register={register}
                         formState={formState}
                         rules={{
-                          required: "This is a required field.",
+                          required: 'This is a required field.',
                         }}
                       />
-                      <span className=" text-left mr-auto self-start place-self-start text-light-gray text-sm">
+                      <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
                         <div>Available macros:</div>
                         {String(
-                          "{externalId}{campaignId}{creativeId}{subscriptionId}{days}{feedId}{clickid}{t1}{t2}{t3}{t4}{t5}{uid}{title}{body}{previewImgName}{bodyImgName}"
+                          '{externalId}{campaignId}{creativeId}{subscriptionId}{days}{feedId}{clickid}{t1}{t2}{t3}{t4}{t5}{uid}{title}{body}{previewImgName}{bodyImgName}',
                         )}
                       </span>
                     </div>
@@ -373,14 +362,14 @@ export default function AddCreative() {
                       register={register}
                       formState={formState}
                       rules={{
-                        required: "This is a required field.",
+                        required: 'This is a required field.',
                       }}
                     />
                   </div>
 
                   <div className=" flex justify-end gap-x-5 py-6">
                     <Button title="Cancel" variant="out-lined" />
-                    <Button title="Save" type={"submit"} />
+                    <Button title="Save" type={'submit'} />
                   </div>
                 </form>
               </div>

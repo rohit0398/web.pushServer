@@ -1,6 +1,7 @@
-import { Fragment, ReactNode } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import type { ReactNode } from 'react';
+import { Fragment } from 'react';
 
 type IProps = {
   open: boolean;
@@ -11,7 +12,7 @@ type IProps = {
 export function Modal({
   open,
   setOpen,
-  width = "sm:max-w-lg sm:w-full",
+  width = 'sm:max-w-lg sm:w-full',
   children,
 }: IProps) {
   return (
@@ -26,11 +27,11 @@ export function Modal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-light-gray bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-light-gray/75 transition-opacity" />
         </Transition.Child>
 
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+        <div className="fixed inset-0 z-10 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -41,10 +42,13 @@ export function Modal({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className={`relative bg-white rounded-lg overflow-hidden shadow-xl transform transition-all py-5 px-5 ${width}`}
+                className={`relative overflow-hidden rounded-lg bg-white p-5 shadow-xl transition-all${width}`}
               >
-                <div onClick={()=> setOpen(false)} className=" absolute top-0 right-0 z-10 p-5 cursor-pointer">
-                  <XMarkIcon className=" w-6 h-6 " />
+                <div
+                  onClick={() => setOpen(false)}
+                  className=" absolute right-0 top-0 z-10 cursor-pointer p-5"
+                >
+                  <XMarkIcon className=" h-6 w-6 " />
                 </div>
                 {children}
               </Dialog.Panel>

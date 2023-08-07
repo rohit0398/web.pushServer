@@ -1,23 +1,24 @@
-import React, { useState } from "react";
-
-import {
+import type { RankingInfo } from '@tanstack/match-sorter-utils';
+import { rankItem } from '@tanstack/match-sorter-utils';
+import type {
   Column,
-  Table,
-  useReactTable,
+  ColumnDef,
   ColumnFiltersState,
+  FilterFn,
+  Table,
+} from '@tanstack/react-table';
+import {
+  flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
+  getFilteredRowModel,
   getSortedRowModel,
-  FilterFn,
-  ColumnDef,
-  flexRender,
-} from "@tanstack/react-table";
+  useReactTable,
+} from '@tanstack/react-table';
+import React, { useState } from 'react';
 
-import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
-
-declare module "@tanstack/table-core" {
+declare module '@tanstack/table-core' {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
   }
@@ -27,7 +28,6 @@ declare module "@tanstack/table-core" {
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  console.log("hll");
   // Rank the item
   const itemRank = rankItem(row.getValue(columnId), value);
 
@@ -40,16 +40,17 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-export type tableDataType = { [key: string]: any };
-export function Table({
+export type TableDataType = { [key: string]: any };
+
+export function CustomTable({
   data,
   columns,
 }: {
-  data: tableDataType[];
+  data: TableDataType[];
   columns: ColumnDef<any>[];
 }) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
 
   const table = useReactTable({
@@ -70,17 +71,17 @@ export function Table({
   });
 
   React.useEffect(() => {
-    if (table.getState().columnFilters[0]?.id === "fullName") {
-      if (table.getState().sorting[0]?.id !== "fullName") {
-        table.setSorting([{ id: "fullName", desc: false }]);
+    if (table.getState().columnFilters[0]?.id === 'fullName') {
+      if (table.getState().sorting[0]?.id !== 'fullName') {
+        table.setSorting([{ id: 'fullName', desc: false }]);
       }
     }
   }, [table.getState().columnFilters[0]?.id]);
 
   return (
-    <div className="p-2 overflow-x-auto">
-      <table className=" table-auto min-w-full text-left text-sm text-gray font-semibold">
-        <thead className=" bg-stroke-light-gray sticky top-0">
+    <div className="overflow-x-auto p-2">
+      <table className=" min-w-full table-auto text-left text-sm font-semibold text-gray">
+        <thead className=" sticky top-0 bg-stroke-light-gray">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
@@ -95,7 +96,7 @@ export function Table({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
 
                       {header.column.getCanFilter() ? (
@@ -119,7 +120,7 @@ export function Table({
                     <td key={cell.id} className=" py-2 pl-2">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </td>
                   );
@@ -150,34 +151,33 @@ function Filter({
 
   const sortedUniqueValues = React.useMemo(
     () =>
-      typeof firstValue === "number"
+      typeof firstValue === 'number'
         ? []
         : Array.from(column.getFacetedUniqueValues().keys()).sort(),
-    [column.getFacetedUniqueValues()]
+    [column.getFacetedUniqueValues()],
   );
 
-  console.log('lokesh uniq', sortedUniqueValues)
   return (
     <div className=" relative">
       <span
-        className=" cursor-pointer ml-1"
+        className=" ml-1 cursor-pointer"
         onClick={() => setShowFilterDropdown((prev) => !prev)}
       >
         🔍
       </span>
-      <div className={showFilterDropdown ? "visible" : "hidden"}>
-        <datalist id={column.id + "list"}>
+      <div className={showFilterDropdown ? 'visible' : 'hidden'}>
+        <datalist id={`${column.id}list`}>
           {sortedUniqueValues.slice(0, 50).map((value: any) => (
             <option value={value} key={value} />
           ))}
         </datalist>
         <DebouncedInput
           type="text"
-          value={(columnFilterValue ?? "") as string}
+          value={(columnFilterValue ?? '') as string}
           onChange={(value) => column.setFilterValue(value)}
           placeholder={`Search... (${column.getFacetedUniqueValues().size})`}
-          className="absolute top-full left-0 z-10 p-2 bg-white border border-light-gray"
-          list={column.id + "list"}
+          className="absolute left-0 top-full z-10 border border-light-gray bg-white p-2"
+          list={`${column.id}list`}
         />
       </div>
     </div>
@@ -194,7 +194,7 @@ function DebouncedInput({
   value: string | number;
   onChange: (value: string | number) => void;
   debounce?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
   const [value, setValue] = React.useState(initialValue);
 
   React.useEffect(() => {

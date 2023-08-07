@@ -1,10 +1,11 @@
-import React from "react";
+import React from 'react';
+
 interface RadioInputProps {
   label: string;
   value: string;
   name: string;
   register: any;
-  checked?: boolean
+  checked?: boolean;
 }
 
 export const RadioInput: React.FC<RadioInputProps> = ({
@@ -12,12 +13,14 @@ export const RadioInput: React.FC<RadioInputProps> = ({
   value,
   name,
   register,
-  checked
+  checked,
 }) => {
   return (
     <div
-      className={`flex items-center justify-center border px-3 rounded min-h-[2.375rem] ${
-        checked ? "border-dark-purple border-2 text-dark-purple" : "border-light-gray"
+      className={`flex min-h-[2.375rem] items-center justify-center rounded border px-3 ${
+        checked
+          ? 'border-2 border-dark-purple text-dark-purple'
+          : 'border-light-gray'
       }`}
     >
       <input
@@ -28,10 +31,7 @@ export const RadioInput: React.FC<RadioInputProps> = ({
         className="hidden"
         {...register(name)}
       />
-      <label
-        htmlFor={value}
-        className="btn btn-default cursor-pointer select-none"
-      >
+      <label htmlFor={value} className=" cursor-pointer select-none">
         {label}
       </label>
     </div>

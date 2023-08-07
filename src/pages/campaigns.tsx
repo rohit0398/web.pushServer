@@ -1,30 +1,17 @@
-import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
+import type { ColumnDef } from '@tanstack/react-table';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { fetchDealsApi } from "@/apiService/deal";
-import { fetchInvestorsApi } from "@/apiService/investor";
-import { fetchStartupsApi } from "@/apiService/startup";
-import {
-  Button,
-  CustomCheckbox,
-  Heading2WithIcon,
-  InputField,
-  Loader,
-  OneLinerCard,
-} from "@/atoms";
-import { Layout } from "@/layouts";
-import { AnnouncementIcon } from "@/public/assets/svg-icons";
-import MultiSelectSearch from "@/atoms/multiSelectedSearch";
-import { RadioInput } from "@/atoms/input/CustomRadiobutton";
-import { ColumnDef } from "@tanstack/react-table";
-import { Table } from "@/atoms/table/table";
+import { Button, CustomCheckbox, InputField } from '@/atoms';
+import { RadioInput } from '@/atoms/input/CustomRadiobutton';
+import MultiSelectSearch from '@/atoms/multiSelectedSearch';
+import { CustomTable } from '@/atoms/table/table';
+import { Layout } from '@/layouts';
 
 const countries = [
-  { value: "us", label: "United States" },
-  { value: "ca", label: "Canada" },
-  { value: "uk", label: "United Kingdom" },
+  { value: 'us', label: 'United States' },
+  { value: 'ca', label: 'Canada' },
+  { value: 'uk', label: 'United Kingdom' },
   // Add more countries as needed
 ];
 
@@ -37,10 +24,17 @@ interface FormData {
   };
   selectedCountries: string[];
   feeds: string[];
+  Language: any;
+  countryCode: any;
+  browsers: any;
+  devices: any;
+  os: any;
+  connection: any;
+  deliveryType: any;
 }
 
 const segmentHeading = `text-xl font-semibold text-gray`;
-const labelClass = `form-label text-medium-gray font-medium mb-2`;
+const labelClass = ` text-medium-gray font-medium mb-2`;
 
 export default function Index() {
   const [create, setCreate] = useState(false);
@@ -52,7 +46,7 @@ export default function Index() {
             acc[index] = true;
             return acc;
           },
-          {} as FormData["hours"]
+          {} as FormData['hours'],
         ),
         days: {
           Monday: true,
@@ -68,82 +62,80 @@ export default function Index() {
 
   // Initialize the form field with an empty array
   useEffect(() => {
-    register("selectedCountries");
-    setValue("selectedCountries", []);
+    register('selectedCountries');
+    setValue('selectedCountries', []);
   }, [register, setValue]);
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-  };
+  const onSubmit = (_data: FormData) => {};
 
   const data = [
     {
-      title: "Angela",
-      feeds: ["ahfhd", "rohit"],
-      id: "13",
-      status: "single",
+      title: 'Angela',
+      feeds: ['ahfhd', 'rohit'],
+      id: '13',
+      status: 'single',
     },
     {
-      title: "Madisen",
-      feeds: ["ahfhd", "rohit"],
-      id: "75",
-      status: "relationship",
+      title: 'Madisen',
+      feeds: ['ahfhd', 'rohit'],
+      id: '75',
+      status: 'relationship',
     },
     {
-      title: "Clair",
-      feeds: ["ahfhd", "rohit"],
-      id: "56",
-      status: "single",
+      title: 'Clair',
+      feeds: ['ahfhd', 'rohit'],
+      id: '56',
+      status: 'single',
     },
     {
-      title: "Emilia",
-      feeds: ["ahfhd", "21rohit21"],
-      id: "20",
-      status: "relationship",
+      title: 'Emilia',
+      feeds: ['ahfhd', '21rohit21'],
+      id: '20',
+      status: 'relationship',
     },
     {
-      title: "Domenic",
-      feeds: ["ahfhd", "21rohit21"],
-      id: "91",
-      status: "complicated",
+      title: 'Domenic',
+      feeds: ['ahfhd', '21rohit21'],
+      id: '91',
+      status: 'complicated',
     },
   ];
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: "id",
-        header: "ID",
-        filterFn: "includesString",
+        accessorKey: 'id',
+        header: 'ID',
+        filterFn: 'includesString',
       },
       {
-        accessorKey: "title",
-        header: "Title",
-        filterFn: "includesString",
+        accessorKey: 'title',
+        header: 'Title',
+        filterFn: 'includesString',
       },
       {
-        accessorKey: "status",
-        header: "Status",
-        filterFn: "includesString",
+        accessorKey: 'status',
+        header: 'Status',
+        filterFn: 'includesString',
       },
       {
-        accessorKey: "countries",
-        header: "Countries",
+        accessorKey: 'countries',
+        header: 'Countries',
       },
       {
-        accessorKey: "feeds",
-        header: "Feeds",
+        accessorKey: 'feeds',
+        header: 'Feeds',
         accessorFn: (row) => {
-          return row?.feeds?.join(",");
+          return row?.feeds?.join(',');
         },
         cell: (info) => {
           const val = info?.getValue() as string;
-          const arr = val?.split(",");
+          const arr = val?.split(',');
           return (
             <div className=" flex gap-x-1">
-              {arr.map((val, ind) => (
-                <span key={ind} className=" bg-light-blue p-1 rounded">
-                  {val}
+              {arr.map((ele, ind) => (
+                <span key={ind} className=" rounded bg-light-blue p-1">
+                  {ele}
                 </span>
               ))}
             </div>
@@ -151,23 +143,25 @@ export default function Index() {
         },
       },
     ],
-    []
+    [],
   );
 
-  const deliveryType = watch("deliveryType") as any;
+  const deliveryType = watch('deliveryType') as any;
   return (
     <Layout>
-      <div className=" w-full mb-5 p-3 sm:p-10 pb-10 bg-stroke-light-gray h-full overflow-y-auto">
-        <div className=" bg-white rounded-2xl p-3 sm:p-10 relative">
+      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+        <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Campaign</h2>
             <Button title="creative" onClick={() => setCreate(true)} />
           </div>
           <div>
-            <Table columns={columns} data={data} />
+            <CustomTable columns={columns} data={data} />
           </div>
           {create && (
-            <div className={`absolute top-0 left-0 right-0 z-20 bg-white p-3 sm:p-10`}>
+            <div
+              className={`absolute inset-x-0 top-0 z-20 bg-white p-3 sm:p-10`}
+            >
               <div className=" flex justify-between">
                 <h2 className="text-3xl font-semibold text-gray">
                   Create Campaign
@@ -194,11 +188,11 @@ export default function Index() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
                 </div>
-                <hr className="border-t mt-6 mb-4" />
+                <hr className="mb-4 mt-6 border-t" />
 
                 <h5 className={segmentHeading}>Targeting options</h5>
 
@@ -266,10 +260,10 @@ export default function Index() {
                   error={formState?.errors?.connection}
                 />
 
-                <div className="form-item">
+                <div className="">
                   <div className={labelClass}>Subscription period</div>
-                  <div className="form-control">
-                    <div className=" flex flex-col items-start sm:flex-row sm:items-center gap-2">
+                  <div className="">
+                    <div className=" flex flex-col items-start gap-2 sm:flex-row sm:items-center">
                       <span>From</span>
                       <InputField
                         name="subscriptionAgeFrom"
@@ -278,7 +272,7 @@ export default function Index() {
                         register={register}
                         formState={formState}
                         rules={{
-                          required: "This is a required field.",
+                          required: 'This is a required field.',
                         }}
                       />
 
@@ -291,7 +285,7 @@ export default function Index() {
                         register={register}
                         formState={formState}
                         rules={{
-                          required: "This is a required field.",
+                          required: 'This is a required field.',
                         }}
                       />
                       <span>hours</span>
@@ -299,38 +293,35 @@ export default function Index() {
                   </div>
                 </div>
 
-                <hr className="border-t mt-6 mb-4" />
-                <div className="form-item">
+                <hr className="mb-4 mt-6 border-t" />
+                <div className="">
                   <div className={segmentHeading}>Delivery type</div>
 
-                  <div className=" flex flex-col sm:flex-row gap-2 mt-6">
+                  <div className=" mt-6 flex flex-col gap-2 sm:flex-row">
                     <RadioInput
                       label="Creative and feed frequency"
                       value="creative-feed"
                       name="deliveryType"
                       register={register}
-                      checked={deliveryType === "creative-feed"}
+                      checked={deliveryType === 'creative-feed'}
                     />
                     <RadioInput
                       label="Creative schedule"
                       value="creative-schedule"
                       name="deliveryType"
                       register={register}
-                      checked={deliveryType === "creative-schedule"}
+                      checked={deliveryType === 'creative-schedule'}
                     />
                     {/* Add more RadioInput components for other options */}
                   </div>
                 </div>
 
-                <div className="form-item">
+                <div className="">
                   <div className={labelClass}>
                     Send random
-                    <span
-                      className="question-icon"
-                      aria-label="question-circle"
-                    />
+                    <span className="" aria-label="question-circle" />
                   </div>
-                  <div className="form-control flex">
+                  <div className=" flex">
                     <InputField
                       name="sendRandomCreatives"
                       type="number"
@@ -338,20 +329,17 @@ export default function Index() {
                       register={register}
                       formState={formState}
                       rules={{
-                        required: "This is a required field.",
+                        required: 'This is a required field.',
                       }}
                     />
                   </div>
                 </div>
-                <div className="form-item">
+                <div className="">
                   <div className={labelClass}>
                     Creatives frequency, hours
-                    <span
-                      className="question-icon"
-                      aria-label="question-circle"
-                    />
+                    <span className="" aria-label="question-circle" />
                   </div>
-                  <div className="form-control flex">
+                  <div className=" flex">
                     <InputField
                       name="frequency"
                       type="number"
@@ -359,19 +347,19 @@ export default function Index() {
                       register={register}
                       formState={formState}
                       rules={{
-                        required: "This is a required field.",
+                        required: 'This is a required field.',
                       }}
                     />
                   </div>
                 </div>
 
-                <hr className="border-t mt-6 mb-4" />
+                <hr className="mb-4 mt-6 border-t" />
                 <div className={segmentHeading}>Time schedule</div>
 
-                <div className="space-y-4 mt-6">
+                <div className="mt-6 space-y-4">
                   <div>
                     <h3 className={labelClass}>Target Hours</h3>
-                    <div className="grid grid-cols-4  sm:grid-cols-8 space-y-2">
+                    <div className="grid grid-cols-4  space-y-2 sm:grid-cols-8">
                       {[...Array(24)].map((_, ind) => (
                         <CustomCheckbox
                           key={ind}
@@ -385,15 +373,15 @@ export default function Index() {
 
                   <div>
                     <h3 className={labelClass}>Target Days</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 space-y-2">
+                    <div className="grid grid-cols-2 space-y-2 sm:grid-cols-4">
                       {[
-                        "Monday",
-                        "Tuesday",
-                        "Wednesday",
-                        "Thursday",
-                        "Friday",
-                        "Saturday",
-                        "Sunday",
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                        'Sunday',
                       ].map((day) => (
                         <CustomCheckbox
                           key={day}
@@ -408,7 +396,7 @@ export default function Index() {
 
                 <div className=" !mt-16">
                   <Button
-                    type={"submit"}
+                    type={'submit'}
                     title="Save"
                     paddingMargin="px-5 lg:px-16"
                   />

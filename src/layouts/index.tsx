@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { ToastContainer } from "react-toastify";
+import type { ReactNode } from 'react';
+import { ToastContainer } from 'react-toastify';
 
-import { Footer, Header } from "@/molecules";
+import { Header } from '@/molecules';
 
 type IProps = {
   children: ReactNode;
@@ -9,7 +9,7 @@ type IProps = {
 };
 export function Layout({ children }: IProps) {
   return (
-    <div className=" flex w-screen h-screen flex-col sm:flex-row">
+    <div className=" flex h-screen w-screen flex-col sm:flex-row">
       <Header />
       {children}
       <ToastContainer />

@@ -1,6 +1,8 @@
-import React, { useCallback, useState } from "react";
-import ReactCrop, { Crop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import 'react-image-crop/dist/ReactCrop.css';
+
+import React, { useCallback, useState } from 'react';
+import type { Crop } from 'react-image-crop';
+import ReactCrop from 'react-image-crop';
 
 interface ReusableReactCropProps {
   src: string;
@@ -18,11 +20,11 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
   height,
 }) => {
   const [crop, setCrop] = useState<Crop>({
-    unit: "px",
+    unit: 'px',
     x: 0,
     y: 0,
-    width: width,
-    height: height,
+    width,
+    height,
   });
 
   const handleCropChange = useCallback((newCrop: Crop) => {
@@ -33,7 +35,7 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
     (completedCrop: Crop) => {
       onCropComplete(completedCrop);
     },
-    [onCropComplete]
+    [onCropComplete],
   );
 
   return (

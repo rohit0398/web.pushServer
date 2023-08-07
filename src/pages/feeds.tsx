@@ -1,106 +1,104 @@
-import { Button, InputField } from "@/atoms";
-import { Table } from "@/atoms/table/table";
-import { Layout } from "@/layouts";
-import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import type { ColumnDef } from '@tanstack/react-table';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { Button, InputField } from '@/atoms';
+import { CustomTable } from '@/atoms/table/table';
+import { Layout } from '@/layouts';
 
 export default function Feeds() {
   const [create, setCreate] = useState(false);
 
-  const { register, handleSubmit, formState } =
-    useForm<FormData>({
-      defaultValues: {},
-    });
+  const { register, handleSubmit, formState } = useForm<FormData>({
+    defaultValues: {},
+  });
 
   const data = [
     {
-      title: "Angela",
+      title: 'Angela',
       subscriptions: 3,
       unsubscribed: 0,
-      id: "13",
-      active: "single",
+      id: '13',
+      active: 'single',
     },
     {
-      title: "Madisen",
+      title: 'Madisen',
       subscriptions: 3,
       unsubscribed: 0,
-      id: "75",
-      active: "relationship",
+      id: '75',
+      active: 'relationship',
     },
     {
-      title: "Clair",
+      title: 'Clair',
       subscriptions: 3,
       unsubscribed: 0,
-      id: "56",
-      active: "single",
+      id: '56',
+      active: 'single',
     },
     {
-      title: "Emilia",
+      title: 'Emilia',
       subscriptions: 8,
       unsubscribed: 1,
-      id: "20",
-      active: "relationship",
+      id: '20',
+      active: 'relationship',
     },
     {
-      title: "Domenic",
+      title: 'Domenic',
       subscriptions: 8,
       unsubscribed: 1,
-      id: "91",
-      active: "complicated",
+      id: '91',
+      active: 'complicated',
     },
   ];
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: "id",
-        header: "ID",
+        accessorKey: 'id',
+        header: 'ID',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "title",
-        header: "Title",
+        accessorKey: 'title',
+        header: 'Title',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "active",
-        header: "Active",
+        accessorKey: 'active',
+        header: 'Active',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "subscriptions",
-        header: "Subscriptions",
+        accessorKey: 'subscriptions',
+        header: 'Subscriptions',
         enableColumnFilter: false,
       },
       {
-        accessorKey: "unsubscribed",
-        header: "Unsubscribed",
+        accessorKey: 'unsubscribed',
+        header: 'Unsubscribed',
         enableColumnFilter: false,
       },
     ],
-    []
+    [],
   );
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-  };
+  const onSubmit = (_data: FormData) => {};
 
   return (
     <Layout>
-      <div className=" w-full mb-5 p-3 sm:p-10 pb-10 bg-stroke-light-gray h-full overflow-y-auto">
-        <div className=" bg-white rounded-2xl p-3 sm:p-10 relative">
+      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+        <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Feeds</h2>
             <Button title="Create" onClick={() => setCreate(true)} />
           </div>
           <div>
-            <Table columns={columns} data={data} />
+            <CustomTable columns={columns} data={data} />
           </div>
 
           {create && (
             <div
-              className={`absolute top-0 left-0 right-0 z-20 bg-white p-3 sm:p-10`}
+              className={`absolute inset-x-0 top-0 z-20 bg-white p-3 sm:p-10`}
             >
               <div className=" flex justify-between">
                 <h2 className="text-3xl font-semibold text-gray">
@@ -126,7 +124,7 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
                   <InputField
@@ -137,7 +135,7 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
                   <InputField
@@ -148,7 +146,7 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
                   <InputField
@@ -159,7 +157,7 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
 
@@ -171,7 +169,7 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
 
@@ -183,13 +181,13 @@ export default function Feeds() {
                     register={register}
                     formState={formState}
                     rules={{
-                      required: "This is a required field.",
+                      required: 'This is a required field.',
                     }}
                   />
                 </div>
 
                 <div className=" mt-8">
-                  <Button type={"submit"} title="Save" />
+                  <Button type={'submit'} title="Save" />
                 </div>
               </form>
             </div>
