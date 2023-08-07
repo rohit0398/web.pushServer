@@ -1,0 +1,26 @@
+@import "react-image-crop/dist/ReactCrop.css";
+@import "react-toastify/dist/ReactToastify.css";
+@import "scrollbar.css";
+@import "form-customize.css";
+
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+html,
+body {
+  @apply text-base;
+  @apply font-open-sans;
+}
+
+svg {
+  @apply inline-block;
+}
+
+@layer {
+  .ReactCrop__child-wrapper {
+    @apply !w-full h-full;
+  }
+}
