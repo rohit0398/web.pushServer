@@ -200,9 +200,9 @@ export default function AddCreative() {
           <Modal
             open={showModal}
             setOpen={(bool) => setShowModal(bool)}
-            width="sm:max-w-4xl sm:w-full max-h-[calc(100vh-4rem)] overflow-y-auto scroll-thin"
+            width="sm:max-w-4xl sm:min-w-[40rem] lg:min-w-[50rem] max-h-[calc(100vh-4rem)] overflow-y-auto scroll-thin"
           >
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col">
               <div className="self-start text-2xl font-semibold text-gray">
                 Add creative
               </div>
