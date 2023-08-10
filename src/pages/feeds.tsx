@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { Button, InputField } from '@/atoms';
+import { Button, InputField, Loader } from '@/atoms';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import api from '@/utils/api';
@@ -25,16 +25,19 @@ export default function Feeds() {
   const [scriptToCopy, setScriptToCopy] = useState('');
   const [create, setCreate] = useState(false);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, formState, reset } = useForm<FormData>({});
 
   useEffect(() => {
+    setLoading(true);
     api
       .get('/feed')
       .then((res) => {
         setData(res.data ?? []);
       })
-      .catch(() => toast.error(wentWrong));
+      .catch(() => toast.error(wentWrong))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleCopyToClipboard = () => {
@@ -141,6 +144,7 @@ export default function Feeds() {
     <Layout>
       <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
         <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
+          {loading && <Loader />}
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Feeds</h2>
             <Button
