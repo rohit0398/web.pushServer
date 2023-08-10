@@ -1,60 +1,100 @@
+/* eslint-disable no-underscore-dangle */
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { Button, InputField } from '@/atoms';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
+import api from '@/utils/api';
+import { updateScriptString, wentWrong } from '@/utils/helper';
+
+type FormData = {
+  allowRedirectUrl: string;
+  blockRedirectUrl: string;
+  description: string;
+  frequency: string;
+  postbackUrl: string;
+  title: string;
+};
 
 export default function Feeds() {
+  const scriptRef = useRef(null);
+  const [scriptToCopy, setScriptToCopy] = useState('');
   const [create, setCreate] = useState(false);
+  const [data, setData] = useState([]);
 
-  const { register, handleSubmit, formState } = useForm<FormData>({
-    defaultValues: {},
-  });
+  const { register, handleSubmit, formState, reset } = useForm<FormData>({});
 
-  const data = [
-    {
-      title: 'Angela',
-      subscriptions: 3,
-      unsubscribed: 0,
-      id: '13',
-      active: 'single',
-    },
-    {
-      title: 'Madisen',
-      subscriptions: 3,
-      unsubscribed: 0,
-      id: '75',
-      active: 'relationship',
-    },
-    {
-      title: 'Clair',
-      subscriptions: 3,
-      unsubscribed: 0,
-      id: '56',
-      active: 'single',
-    },
-    {
-      title: 'Emilia',
-      subscriptions: 8,
-      unsubscribed: 1,
-      id: '20',
-      active: 'relationship',
-    },
-    {
-      title: 'Domenic',
-      subscriptions: 8,
-      unsubscribed: 1,
-      id: '91',
-      active: 'complicated',
-    },
-  ];
+  useEffect(() => {
+    api
+      .get('/feed')
+      .then((res) => {
+        setData(res.data ?? []);
+      })
+      .catch(() => toast.error(wentWrong));
+  }, []);
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(scriptToCopy);
+  };
+
+  function handleDelete({ ind }: { ind: number; _id?: string }) {
+    const raw = [...data];
+    raw.splice(ind, 1);
+    setData(raw);
+  }
+
+  function handelEdit(singleRow: any) {
+    setCreate(true);
+    reset(singleRow);
+  }
+
+  async function handleCancelCreate() {
+    reset({
+      allowRedirectUrl: '',
+      blockRedirectUrl: '',
+      description: '',
+      frequency: '0',
+      postbackUrl: '',
+      title: '',
+    });
+    setCreate(false);
+  }
+
+  const onSubmit = async (values: FormData) => {
+    try {
+      const {
+        allowRedirectUrl,
+        blockRedirectUrl,
+        description,
+        frequency,
+        postbackUrl,
+        title,
+      } = values;
+
+      await api.post('/feed', data);
+      toast.success('Feed create successfully');
+      setScriptToCopy(
+        updateScriptString({
+          UPDATE_TITLE: title,
+          UPDATE_BODY: description,
+          UPDATE_POSTBACK_URL: `${postbackUrl}&frequency=${frequency}`,
+          UPDATE_SUCCESS_URL: allowRedirectUrl,
+          UPDATE_DENIED_URL: blockRedirectUrl,
+        }),
+      );
+    } catch (_err) {
+      toast.error(wentWrong);
+    }
+  };
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: 'id',
+        accessorKey: '_id',
         header: 'ID',
         enableColumnFilter: false,
       },
@@ -64,25 +104,38 @@ export default function Feeds() {
         enableColumnFilter: false,
       },
       {
-        accessorKey: 'active',
-        header: 'Active',
-        enableColumnFilter: false,
-      },
-      {
         accessorKey: 'subscriptions',
-        header: 'Subscriptions',
+        header: 'Active subscriptions',
         enableColumnFilter: false,
       },
       {
-        accessorKey: 'unsubscribed',
-        header: 'Unsubscribed',
+        accessorKey: 'actions',
+        header: 'actions',
         enableColumnFilter: false,
+        cell: ({ row }) => {
+          return (
+            <div className="flex gap-6">
+              <div
+                onClick={() =>
+                  handleDelete({ ind: row.index, _id: row.original?._id })
+                }
+                className=" flex cursor-pointer gap-x-1 p-4 pl-0"
+              >
+                <TrashIcon className=" h-4 w-4 text-dark-purple" />
+              </div>
+              <div
+                onClick={() => handelEdit(row.original)}
+                className=" flex cursor-pointer gap-x-1 p-4"
+              >
+                <PencilIcon className=" h-4 w-4 text-dark-purple" />
+              </div>
+            </div>
+          );
+        },
       },
     ],
     [],
   );
-
-  const onSubmit = (_data: FormData) => {};
 
   return (
     <Layout>
@@ -90,108 +143,119 @@ export default function Feeds() {
         <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Feeds</h2>
-            <Button title="Create" onClick={() => setCreate(true)} />
+            <Button
+              title="Create"
+              onClick={() => {
+                setCreate(true);
+              }}
+            />
           </div>
           <div>
             <CustomTable columns={columns} data={data} />
           </div>
 
-          {create && (
-            <div
-              className={`absolute inset-x-0 top-0 z-20 bg-white p-3 sm:p-10`}
-            >
-              <div className=" flex justify-between">
-                <h2 className="text-3xl font-semibold text-gray">
-                  Create Feed
-                </h2>
+          <div
+            className={`absolute inset-x-0 top-0 bg-white p-3 sm:p-10 ${
+              create ? 'absolute z-20' : ' -z-20'
+            }`}
+          >
+            <div className=" flex justify-between">
+              <h2 className="text-3xl font-semibold text-gray">Create Feed</h2>
 
-                <Button
-                  title="Cancel"
-                  variant="out-lined"
-                  onClick={() => setCreate(false)}
+              <Button
+                title="Cancel"
+                variant="out-lined"
+                onClick={handleCancelCreate}
+              />
+            </div>
+            <form className="mt-4 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-5">
+                <InputField
+                  label="Title"
+                  name="title"
+                  type="text"
+                  placeholder="Type here"
+                  register={register}
+                  formState={formState}
+                  rules={{
+                    required: 'This is a required field.',
+                  }}
+                />
+                <InputField
+                  label="Description"
+                  name="description"
+                  type="text"
+                  placeholder="Type here"
+                  register={register}
+                  formState={formState}
+                />
+                <InputField
+                  label="Postback URL"
+                  name="postbackUrl"
+                  type="text"
+                  placeholder="Type here"
+                  register={register}
+                  formState={formState}
+                  rules={{
+                    required: 'This is a required field.',
+                  }}
+                />
+                <InputField
+                  label="Frequency"
+                  name="frequency"
+                  type="number"
+                  placeholder="0"
+                  defaultValue={0}
+                  register={register}
+                  formState={formState}
+                  rules={{
+                    required: 'This is a required field.',
+                  }}
+                />
+
+                <InputField
+                  label={`Redirect URL when a user clicks "Allow"`}
+                  name="allowRedirectUrl"
+                  type="text"
+                  placeholder="https://domainname.com/someurl.php"
+                  register={register}
+                  formState={formState}
+                />
+
+                <InputField
+                  label={`Redirect URL when a user clicks "Block" or if there is no support for push notifications`}
+                  name="blockRedirectUrl"
+                  type="text"
+                  placeholder="https://domainname.com/someurl.php"
+                  register={register}
+                  formState={formState}
                 />
               </div>
-              <form
-                className="mt-4 space-y-6"
-                onSubmit={handleSubmit(onSubmit)}
-              >
-                <div className="flex flex-col gap-5">
-                  <InputField
-                    label="Title"
-                    name="title"
-                    type="text"
-                    placeholder="Type here"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-                  <InputField
-                    label="Description"
-                    name="description"
-                    type="text"
-                    placeholder="Type here"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-                  <InputField
-                    label="Postback URL"
-                    name="postbackUrl"
-                    type="text"
-                    placeholder="Type here"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-                  <InputField
-                    label="Frequency"
-                    name="frequency"
-                    type="number"
-                    placeholder="0"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
 
-                  <InputField
-                    label={`Redirect URL when a user clicks "Allow"`}
-                    name="allowRedirectUrl"
-                    type="text"
-                    placeholder="https://domainname.com/someurl.php"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-
-                  <InputField
-                    label={`Redirect URL when a user clicks "Block" or if there is no support for push notifications`}
-                    name="blockRedirectUrl"
-                    type="text"
-                    placeholder="https://domainname.com/someurl.php"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-                </div>
-
-                <div className=" mt-8">
+              <div className=" mt-8 grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
+                <div>
                   <Button type={'submit'} title="Save" />
                 </div>
-              </form>
-            </div>
-          )}
+                {scriptToCopy && (
+                  <div className="">
+                    <textarea
+                      contentEditable={false}
+                      ref={scriptRef}
+                      value={scriptToCopy}
+                      readOnly
+                      className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
+                    />
+
+                    <Button
+                      onClick={handleCopyToClipboard}
+                      variant="out-lined"
+                      title="Copy Script To Clipboard"
+                    />
+                  </div>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </Layout>

@@ -3,6 +3,8 @@ import type { Crop } from 'react-image-crop';
 export const emailRegx =
   "^[a-zA-Z0-9.#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
 
+export const wentWrong = `Something went wrong! Please try again`;
+
 export const ServiceTitlesMap: { [key: string]: string } = {
   startups: '🚀  Startups',
   investors: '📊 Investors',
@@ -114,4 +116,55 @@ export function getCroppedCanvas(
       resolve(blob);
     }, mimeType);
   });
+}
+
+const scriptStr = `<script>(function () {
+  var o = document.getElementById("pushNotificationButton");
+  o ? o.addEventListener("click", function () {
+    "Notification" in window && navigator.serviceWorker && Notification.requestPermission().then(function (o) {
+      if ("granted" === o) {
+        var _o = {
+          title: "UPDATE_TITLE",
+          body: "UPDATE_BODY"
+        };
+        new Notification(_o.title, _o), fetch("UPDATE_POSTBACK_URL", {
+          headers: {
+            Authorization: "UPDATE_TOKEN",
+            "Custom-Header": "UPDATE_CUSTOM_VALUE"
+          }
+        })["catch"](function (o) {
+          console.error("Fetch error:", o);
+        }), window.location.href = "UPDATE_SUCCESS_URL";
+      } else "denied" === o && (window.location.href = "UPDATE_DENIED_URL");
+    });
+  }) : console.log("notification button not found");
+})();</script>`;
+
+type IupdateScriptString = {
+  UPDATE_TITLE: string;
+  UPDATE_BODY?: string;
+  UPDATE_POSTBACK_URL: string;
+  UPDATE_TOKEN?: string;
+  UPDATE_CUSTOM_VALUE?: string;
+  UPDATE_SUCCESS_URL?: string;
+  UPDATE_DENIED_URL?: string;
+};
+export function updateScriptString(obj: IupdateScriptString) {
+  const updatingKeys = {
+    UPDATE_BODY: '',
+    UPDATE_TOKEN: '',
+    UPDATE_CUSTOM_VALUE: '',
+    UPDATE_SUCCESS_URL: '',
+    UPDATE_DENIED_URL: '',
+    ...obj,
+  };
+  const regexPattern = new RegExp(
+    `\\b(?:${Object.keys(updatingKeys).join('|')})\\b`,
+    'gi',
+  );
+  const str = scriptStr.replace(regexPattern, (matched) => {
+    return updatingKeys[matched as keyof IupdateScriptString];
+  });
+
+  return str;
 }

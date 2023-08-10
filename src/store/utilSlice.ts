@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default */
 /* eslint-disable no-param-reassign */
 
 import type { PayloadAction } from '@reduxjs/toolkit';

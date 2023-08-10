@@ -22,6 +22,17 @@ api.interceptors.request.use(function (config: any) {
   return config;
 });
 
+api.interceptors.response.use(
+  function (response) {
+    // You can process the response data here before returning it
+    return { status: response.status, ...response.data }; // Return the response data
+  },
+  function (error) {
+    // Handle any error that occurred during the request
+    return Promise.reject(error);
+  },
+);
+
 export default api;
 if (global.window) {
   (window as any).api = api;
