@@ -1,17 +1,32 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-param-reassign */
+
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { ColumnDef } from '@tanstack/react-table';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Crop } from 'react-image-crop';
+import { toast } from 'react-toastify';
 
-import { Button, InputField, Modal } from '@/atoms';
+import { Button, InputField, Loader, Modal } from '@/atoms';
+import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import ReusableReactCrop from '@/molecules/imageCrop';
-import { getCroppedCanvas } from '@/utils/helper';
+import api from '@/utils/api';
+import { getCroppedCanvas, wentWrong } from '@/utils/helper';
 
 type FormData = {
   previewImage: FileList;
   bodyImage: FileList;
+  title: string;
+  body: string;
+  url: string;
+  buttonTitle: string;
+  buttonUrl: string;
+  campaignId: string;
+  _id?: string;
 };
 
 interface ImageState {
@@ -21,6 +36,13 @@ interface ImageState {
 
 export default function AddCreative() {
   const [showModal, setShowModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [actionButton, setActionButton] = useState(false);
+  const [deletingObj, setDeletingObj] = useState<{ ind: number; _id: string }>({
+    ind: 0,
+    _id: '',
+  });
+  const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<ImageState>({
     selectedFile: undefined,
     imgSrc: null,
@@ -30,9 +52,20 @@ export default function AddCreative() {
     imgSrc: null,
   });
 
-  const { register, handleSubmit, formState } = useForm<FormData>();
+  const [data, setData] = useState([]);
+
+  const { register, handleSubmit, formState, reset } = useForm<FormData>();
   // const previewImg = watch('previewImage');
   // const bodyImg = watch('bodyImage');
+
+  useEffect(() => {
+    setLoading(true);
+    api
+      .get('/creative')
+      .then((res) => setData(res?.data))
+      .catch(() => toast.error(wentWrong))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleCropComplete = useCallback(
     async (crop: Crop, isPreviewImage: boolean) => {
@@ -81,47 +114,66 @@ export default function AddCreative() {
     [images, bodyImages],
   );
 
-  const onSubmit = (_data: FormData) => {
-    // Handle file submission here
-  };
+  function handelEdit(singleRow: any) {
+    setShowModal(true);
+    reset(singleRow);
+    if (singleRow?.buttonTitle) setActionButton(true);
+  }
 
-  const data = [
-    {
-      title: 'Angela',
-      tags: ['ahfhd', 'rohit'],
-      id: '13',
-      status: 'single',
-    },
-    {
-      title: 'Madisen',
-      tags: ['ahfhd', 'rohit'],
-      id: '75',
-      status: 'relationship',
-    },
-    {
-      title: 'Clair',
-      tags: ['ahfhd', 'rohit'],
-      id: '56',
-      status: 'single',
-    },
-    {
-      title: 'Emilia',
-      tags: ['ahfhd', '21rohit21'],
-      id: '20',
-      status: 'relationship',
-    },
-    {
-      title: 'Domenic',
-      tags: ['ahfhd', '21rohit21'],
-      id: '91',
-      status: 'complicated',
-    },
-  ];
+  function handleDelete({ ind, _id }: { ind: number; _id: string }) {
+    setDeletingObj({ ind, _id });
+    setConfirmModal(true);
+  }
+
+  async function handleCancelCreate() {
+    reset({
+      title: '',
+      body: '',
+      campaignId: '',
+      url: '',
+      buttonTitle: '',
+      buttonUrl: '',
+    });
+    setShowModal(false);
+    setActionButton(false);
+  }
+
+  function handelConfirm() {
+    const raw = [...data];
+    raw.splice(deletingObj?.ind, 1);
+    setData(raw);
+    setConfirmModal(false);
+    setLoading(true);
+    api
+      .delete(`/creative/${deletingObj?._id}`)
+      .then(() => {
+        toast.success('Creative deleted successfully');
+      })
+      .catch(() => toast.error(wentWrong))
+      .finally(() => setLoading(false));
+  }
+
+  const onSubmit = async (values: FormData) => {
+    setLoading(true);
+    values.bodyImage =
+      'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=328&ixid=MnwxfDB8MXxyYW5kb218MHx8c2FsZXx8fHx8fDE2OTIxMDY2NzE&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=492' as any;
+    values.previewImage =
+      'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=196&ixid=MnwxfDB8MXxyYW5kb218MHx8c2FsZXx8fHx8fDE2OTIxMDY2NzE&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=196' as any;
+    try {
+      setLoading(true);
+      if (values?._id) await api.patch('/creative', data);
+      else await api.post('/creative', data);
+      toast.success('Creative created successfully');
+      setLoading(false);
+    } catch (_err) {
+      toast.error(wentWrong);
+    }
+  };
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
-        accessorKey: 'id',
+        accessorKey: '_id',
         header: 'ID',
         filterFn: 'includesString',
         enableColumnFilter: false,
@@ -141,46 +193,70 @@ export default function AddCreative() {
         accessorKey: 'body',
         header: 'Body',
         enableColumnFilter: false,
-      },
-      {
-        accessorKey: 'tags',
-        header: 'Tags',
-        accessorFn: (row) => {
-          return row?.tags?.join(',');
-        },
-        cell: (info) => {
-          const val = info?.getValue() as string;
-          const arr = val?.split(',');
+        cell: ({ row }) => {
           return (
-            <div className=" flex gap-x-1">
-              {arr.map((ele, ind) => (
-                <span key={ind} className=" rounded bg-light-blue p-1">
-                  {ele}
-                </span>
-              ))}
+            <div className=" max-w-[10rem] truncate">
+              {row?.getValue('body')}
             </div>
           );
         },
       },
       {
-        accessorKey: 'random',
-        header: 'Random',
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: 'data',
-        header: 'Data',
-        enableColumnFilter: false,
-      },
-      {
         accessorKey: 'previewImage',
         header: 'Preview Image',
         enableColumnFilter: false,
+        cell: ({ row }) => {
+          return (
+            <div className=" my-2 max-h-24 max-w-[12rem] overflow-hidden rounded-md">
+              <img
+                alt="pImage"
+                src={row?.getValue('previewImage')}
+                className=" h-full w-full object-contain "
+              />
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'bodyImage',
         header: 'Body Image',
         enableColumnFilter: false,
+        cell: ({ row }) => {
+          return (
+            <div className=" my-2 max-h-20 max-w-[10rem] overflow-hidden rounded-md">
+              <img
+                alt="bImage"
+                src={row?.getValue('bodyImage')}
+                className=" h-full w-full object-contain "
+              />
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'actions',
+        header: 'actions',
+        enableColumnFilter: false,
+        cell: ({ row }) => {
+          return (
+            <div className="flex gap-6">
+              <div
+                onClick={() =>
+                  handleDelete({ ind: row.index, _id: row.original?._id })
+                }
+                className=" flex cursor-pointer gap-x-1 p-4 pl-0"
+              >
+                <TrashIcon className=" h-4 w-4 text-dark-purple" />
+              </div>
+              <div
+                onClick={() => handelEdit(row.original)}
+                className=" flex cursor-pointer gap-x-1 p-4"
+              >
+                <PencilIcon className=" h-4 w-4 text-dark-purple" />
+              </div>
+            </div>
+          );
+        },
       },
     ],
     [],
@@ -190,16 +266,19 @@ export default function AddCreative() {
     <Layout>
       <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
         <div className=" rounded-2xl bg-white p-3 sm:p-10">
+          {loading && <Loader />}
           <div className=" mb-8 flex justify-between">
-            <div className=" text-3xl font-semibold text-gray">Create</div>
-            <Button title="creative" onClick={() => setShowModal(true)} />
+            <div className=" text-3xl font-semibold text-gray">Creative</div>
+            <Button title="create" onClick={() => setShowModal(true)} />
           </div>
 
           <CustomTable columns={columns} data={data} />
 
           <Modal
             open={showModal}
-            setOpen={(bool) => setShowModal(bool)}
+            setOpen={(bool) => {
+              bool === true ? setShowModal(bool) : handleCancelCreate();
+            }}
             width="sm:max-w-4xl sm:min-w-[40rem] lg:min-w-[50rem] max-h-[calc(100vh-4rem)] overflow-y-auto scroll-thin"
           >
             <div className="flex w-full flex-col">
@@ -228,15 +307,18 @@ export default function AddCreative() {
                         accept="image/png, image/jpeg"
                         register={register}
                         formState={formState}
-                        required
                         validate={{
                           fileFormat: (value: any) =>
-                            ['image/jpeg', 'image/png'].includes(
-                              value[0]?.type,
-                            ) || 'Unsupported file format',
+                            value[0]
+                              ? ['image/jpeg', 'image/png'].includes(
+                                  value[0]?.type,
+                                ) || 'Unsupported file format'
+                              : true,
                           fileSize: (value: any) =>
-                            value[0]?.size < 1024 * 1024 * 5 ||
-                            'File size exceeds 5MB',
+                            value[0]
+                              ? value[0]?.size < 1024 * 1024 * 5 ||
+                                'File size exceeds 5MB'
+                              : true,
                         }}
                         onChange={(e) => handleFileSelect(e, true)}
                       />
@@ -277,15 +359,19 @@ export default function AddCreative() {
                         accept="image/png, image/jpeg"
                         register={register}
                         formState={formState}
-                        required
                         validate={{
                           fileFormat: (value: any) =>
-                            ['image/jpeg', 'image/png'].includes(
-                              value[0]?.type,
-                            ) || 'Unsupported file format',
+                            value[0]
+                              ? ['image/jpeg', 'image/png'].includes(
+                                  value[0]?.type,
+                                ) || 'Unsupported file format'
+                              : true,
+
                           fileSize: (value: any) =>
-                            value[0]?.size < 1024 * 1024 * 5 ||
-                            'File size exceeds 5MB',
+                            value[0]
+                              ? value[0]?.size < 1024 * 1024 * 5 ||
+                                'File size exceeds 5MB'
+                              : true,
                         }}
                         onChange={(e) => handleFileSelect(e, false)}
                       />
@@ -310,7 +396,7 @@ export default function AddCreative() {
                     <div className=" flex flex-col">
                       <InputField
                         label="Title"
-                        name="Title"
+                        name="title"
                         placeholder="Title"
                         register={register}
                         formState={formState}
@@ -326,7 +412,7 @@ export default function AddCreative() {
                     <div className=" flex flex-col">
                       <InputField
                         label="Body"
-                        name="Body"
+                        name="body"
                         placeholder="Body"
                         register={register}
                         formState={formState}
@@ -339,7 +425,7 @@ export default function AddCreative() {
                     <div className=" flex flex-col">
                       <InputField
                         label="URL"
-                        name="URL"
+                        name="url"
                         placeholder="URL"
                         register={register}
                         formState={formState}
@@ -355,26 +441,62 @@ export default function AddCreative() {
                       </span>
                     </div>
 
-                    <InputField
-                      label="Delay"
-                      name="Delay"
-                      placeholder="Delay"
-                      register={register}
-                      formState={formState}
-                      rules={{
-                        required: 'This is a required field.',
-                      }}
-                    />
+                    <div className=" flex flex-col gap-4">
+                      {actionButton && (
+                        <div>
+                          <div className="mb-1 block text-left text-gray">
+                            Add Action Button
+                          </div>
+                          <div className=" grid grid-cols-3 gap-4">
+                            <InputField
+                              name="buttonTitle"
+                              placeholder="Title (i.e. Order)"
+                              register={register}
+                              formState={formState}
+                            />
+                            <div className=" col-span-2">
+                              <InputField
+                                name="buttonUrl"
+                                placeholder="Callback URL (i.e. https://a1.com)"
+                                register={register}
+                                formState={formState}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <Button
+                        onClick={() => setActionButton((bool) => !bool)}
+                        title={
+                          actionButton
+                            ? 'Remove Action Button'
+                            : 'Add Action (Button) to Creative'
+                        }
+                        variant="out-lined"
+                        size="h-10 w-fit"
+                        fontSize="text-sm lg:text-base lg:font-normal opacity-90"
+                      />
+                    </div>
                   </div>
 
                   <div className=" flex justify-end gap-x-5 py-6">
-                    <Button title="Cancel" variant="out-lined" />
+                    <Button
+                      onClick={handleCancelCreate}
+                      title="Cancel"
+                      variant="out-lined"
+                    />
                     <Button title="Save" type={'submit'} />
                   </div>
                 </form>
               </div>
             </div>
           </Modal>
+          <ConfirmationModal
+            isOpen={confirmModal}
+            onCancel={() => setConfirmModal(false)}
+            onConfirm={handelConfirm}
+            title="Are you sure!"
+          />
         </div>
       </div>
     </Layout>

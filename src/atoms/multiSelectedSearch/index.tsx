@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Controller } from 'react-hook-form';
 import type { Props as SelectProps } from 'react-select';
 import Select from 'react-select';
 
@@ -6,44 +7,38 @@ interface MultiSelectSearchProps<Option> {
   options: SelectProps<Option>['options'];
   name: string;
   label: string;
-  register: any;
+  control: any;
   error: any;
 }
 const MultiSelectSearch = <Option extends { label: string; value: string }>({
   options,
   name,
   label,
-  register,
+  control,
   error,
 }: MultiSelectSearchProps<Option>) => {
-  const [selectedOptions, setSelectedOptions] = useState<
-    SelectProps<Option>['value']
-  >([]);
-
-  useEffect(() => {
-    register(name);
-  }, [register, name]);
-  const handleChange = (selected: SelectProps<Option>['value']) => {
-    setSelectedOptions(selected);
-  };
-
   return (
     <div className="mb-4">
       <label htmlFor={name} className=" mb-2 font-medium text-medium-gray">
         {label}
       </label>
-      <Select
-        options={options}
-        isMulti
-        value={selectedOptions}
-        onChange={handleChange}
+      <Controller
         name={name}
-        inputId={name}
-        instanceId={name}
-        className={`rounded-md shadow-sm focus:ring ${
-          error?.[name] ? 'border-red-500' : 'border-light-gray'
-        }`}
+        control={control}
+        render={({ field }) => (
+          <Select
+            options={options}
+            isMulti
+            inputId={name}
+            instanceId={name}
+            className={`rounded-md shadow-sm focus:ring ${
+              error?.[name] ? 'border-red-500' : 'border-light-gray'
+            }`}
+            {...field}
+          />
+        )}
       />
+
       {error?.[name] && (
         <p className="text-red-500">{error?.[name]?.message}</p>
       )}

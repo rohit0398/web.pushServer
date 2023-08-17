@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { Button, InputField, Loader } from '@/atoms';
+import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import api from '@/utils/api';
@@ -18,6 +19,7 @@ type FormData = {
   frequency: string;
   postbackUrl: string;
   title: string;
+  _id?: string;
 };
 
 export default function Feeds() {
@@ -25,6 +27,11 @@ export default function Feeds() {
   const [scriptToCopy, setScriptToCopy] = useState('');
   const [create, setCreate] = useState(false);
   const [data, setData] = useState([]);
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [deletingObj, setDeletingObj] = useState<{ ind: number; _id: string }>({
+    ind: 0,
+    _id: '',
+  });
   const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, formState, reset } = useForm<FormData>({});
@@ -44,15 +51,30 @@ export default function Feeds() {
     navigator.clipboard.writeText(scriptToCopy);
   };
 
-  function handleDelete({ ind }: { ind: number; _id?: string }) {
+  function handleDelete({ ind, _id }: { ind: number; _id: string }) {
+    setDeletingObj({ ind, _id });
+    setOpenConfirmationModal(true);
+  }
+
+  function handelConfirm() {
     const raw = [...data];
-    raw.splice(ind, 1);
+    raw.splice(deletingObj?.ind, 1);
     setData(raw);
+    setOpenConfirmationModal(false);
+    setLoading(true);
+    api
+      .delete(`/feed/${deletingObj?._id}`)
+      .then(() => {
+        toast.success('Feed deleted successfully');
+      })
+      .catch(() => toast.error(wentWrong))
+      .finally(() => setLoading(false));
   }
 
   function handelEdit(singleRow: any) {
     setCreate(true);
     reset(singleRow);
+    handleSetScript(singleRow);
   }
 
   async function handleCancelCreate() {
@@ -65,30 +87,27 @@ export default function Feeds() {
       title: '',
     });
     setCreate(false);
+    setScriptToCopy('');
+  }
+
+  function handleSetScript(obj: any) {
+    const { allowRedirectUrl, blockRedirectUrl } = obj;
+    setScriptToCopy(
+      updateScriptString({
+        UPDATE_SUCCESS_URL: allowRedirectUrl,
+        UPDATE_DENIED_URL: blockRedirectUrl,
+        UPDATE_FEEDID: obj?._id,
+      }),
+    );
   }
 
   const onSubmit = async (values: FormData) => {
     try {
-      const {
-        allowRedirectUrl,
-        blockRedirectUrl,
-        description,
-        frequency,
-        postbackUrl,
-        title,
-      } = values;
-
-      await api.post('/feed', data);
+      const feedRes = values?._id
+        ? await api.patch(`/feed/${values?._id}`, values)
+        : await api.post('/feed', values);
       toast.success('Feed create successfully');
-      setScriptToCopy(
-        updateScriptString({
-          UPDATE_TITLE: title,
-          UPDATE_BODY: description,
-          UPDATE_POSTBACK_URL: `${postbackUrl}&frequency=${frequency}`,
-          UPDATE_SUCCESS_URL: allowRedirectUrl,
-          UPDATE_DENIED_URL: blockRedirectUrl,
-        }),
-      );
+      handleSetScript({ ...values, _id: feedRes?.data?._id });
     } catch (_err) {
       toast.error(wentWrong);
     }
@@ -238,7 +257,10 @@ export default function Feeds() {
 
               <div className=" mt-8 grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
                 <div>
-                  <Button type={'submit'} title="Save" />
+                  <Button
+                    type={'submit'}
+                    title={scriptToCopy ? 'Update' : 'Save'}
+                  />
                 </div>
                 {scriptToCopy && (
                   <div className="">
@@ -259,6 +281,13 @@ export default function Feeds() {
                 )}
               </div>
             </form>
+
+            <ConfirmationModal
+              isOpen={openConfirmationModal}
+              onCancel={() => setOpenConfirmationModal(false)}
+              onConfirm={handelConfirm}
+              title="Are you sure!"
+            />
           </div>
         </div>
       </div>

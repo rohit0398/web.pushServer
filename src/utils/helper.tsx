@@ -118,44 +118,24 @@ export function getCroppedCanvas(
   });
 }
 
-const scriptStr = `<script>(function () {
-  var o = document.getElementById("pushNotificationButton");
-  o ? o.addEventListener("click", function () {
-    "Notification" in window && navigator.serviceWorker && Notification.requestPermission().then(function (o) {
-      if ("granted" === o) {
-        var _o = {
-          title: "UPDATE_TITLE",
-          body: "UPDATE_BODY"
-        };
-        new Notification(_o.title, _o), fetch("UPDATE_POSTBACK_URL", {
-          headers: {
-            Authorization: "UPDATE_TOKEN",
-            "Custom-Header": "UPDATE_CUSTOM_VALUE"
-          }
-        })["catch"](function (o) {
-          console.error("Fetch error:", o);
-        }), window.location.href = "UPDATE_SUCCESS_URL";
-      } else "denied" === o && (window.location.href = "UPDATE_DENIED_URL");
-    });
-  }) : console.log("notification button not found");
-})();</script>`;
+const scriptStr = `<script>
+const feedId = "UPDATE_FEEDID";
+const successUrl = "UPDATE_SUCCESS_URL"
+const updateDeniedUrl = "UPDATE_DENIED_URL"
+</script>
+<script src=${process?.env?.NEXT_PUBLIC_API_URL}/api/v1/script/push-notification-script.js >
+</script>`;
 
 type IupdateScriptString = {
-  UPDATE_TITLE: string;
-  UPDATE_BODY?: string;
-  UPDATE_POSTBACK_URL: string;
-  UPDATE_TOKEN?: string;
-  UPDATE_CUSTOM_VALUE?: string;
   UPDATE_SUCCESS_URL?: string;
   UPDATE_DENIED_URL?: string;
+  UPDATE_FEEDID?: string;
 };
 export function updateScriptString(obj: IupdateScriptString) {
   const updatingKeys = {
-    UPDATE_BODY: '',
-    UPDATE_TOKEN: '',
-    UPDATE_CUSTOM_VALUE: '',
     UPDATE_SUCCESS_URL: '',
     UPDATE_DENIED_URL: '',
+    UPDATE_FEEDID: '',
     ...obj,
   };
   const regexPattern = new RegExp(
@@ -167,4 +147,59 @@ export function updateScriptString(obj: IupdateScriptString) {
   });
 
   return str;
+}
+
+export function convertOptionsToValues(
+  arr: {
+    [key: string]: string;
+  }[],
+) {
+  if (Array.isArray(arr)) {
+    return arr.map((val) => val?.value ?? '');
+  }
+  return [];
+}
+
+export function convertValuesToOptions(arr: string[]) {
+  if (Array.isArray(arr)) {
+    return arr.map((val) => {
+      return { label: splitCamelCase(val), value: val ?? '' };
+    });
+  }
+  return [];
+}
+
+export function convertValuesToOptionsDaysHours(arr: string[], str?: 'hours') {
+  if (Array.isArray(arr) && arr.length) {
+    const obj: any = {};
+    for (const val of arr) {
+      obj[val] = true;
+    }
+    return obj;
+  }
+  if (str === 'hours') return resetDaysHours('hours');
+  return resetDaysHours();
+}
+
+export function splitCamelCase(keyword: string) {
+  return keyword && typeof keyword === 'string'
+    ? keyword.replace(/([a-z])([A-Z])/g, '$1 $2')
+    : '';
+}
+
+export function resetDaysHours(str?: 'hours') {
+  if (str === 'hours')
+    return [...Array(24)].reduce((acc, _, index) => {
+      acc[index] = true;
+      return acc;
+    }, {});
+  return {
+    Monday: true,
+    Tuesday: true,
+    Wednesday: true,
+    Thursday: true,
+    Friday: true,
+    Saturday: true,
+    Sunday: true,
+  };
 }

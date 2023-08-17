@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 
 type IProps = {
   open: boolean;
-  setOpen: (bool: boolean) => void;
+  setOpen?: (bool: boolean) => void;
   width?: string;
   children: ReactNode;
 };
@@ -17,7 +17,11 @@ export function Modal({
 }: IProps) {
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={setOpen || (() => {})}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -44,12 +48,14 @@ export function Modal({
               <Dialog.Panel
                 className={`relative overflow-hidden rounded-lg bg-white p-5 shadow-xl transition-all${width}`}
               >
-                <div
-                  onClick={() => setOpen(false)}
-                  className=" absolute right-0 top-0 z-10 cursor-pointer p-5"
-                >
-                  <XMarkIcon className=" h-6 w-6 " />
-                </div>
+                {setOpen && (
+                  <div
+                    onClick={() => setOpen(false)}
+                    className=" absolute right-0 top-0 z-10 cursor-pointer p-5"
+                  >
+                    <XMarkIcon className=" h-6 w-6 " />
+                  </div>
+                )}
                 {children}
               </Dialog.Panel>
             </Transition.Child>

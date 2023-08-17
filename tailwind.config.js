@@ -37,6 +37,7 @@ module.exports = {
         'stroke-gray': '#D8D8D8',
         'stroke-light-gray': '#F7F6F6',
         'light-blue': '#bffaff',
+        'light-yellow': '#faad14',
       },
       fontSize: {
         xxs: '.625rem',
