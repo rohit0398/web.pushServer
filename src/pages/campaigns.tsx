@@ -168,11 +168,7 @@ export default function Campaign() {
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Campaign</h2>
 
-            <Button
-              id={'pushNotificationButton'}
-              title="create"
-              onClick={() => setCreate(true)}
-            />
+            <Button title="create" onClick={() => setCreate(true)} />
           </div>
           <div>
             <CustomTable columns={columns} data={data} />

@@ -1,5 +1,6 @@
 import {
   Bars3Icon,
+  BellIcon,
   ChartPieIcon,
   FunnelIcon,
   PaperAirplaneIcon,
@@ -27,6 +28,7 @@ export function Header() {
     },
     { name: 'Creatives', icon: <PhotoIcon className="mr-1.5 h-6 w-6" /> },
     { name: 'Feeds', icon: <FunnelIcon className="mr-1.5 h-6 w-6" /> },
+    { name: 'Notification', icon: <BellIcon className="mr-1.5 h-6 w-6" /> },
   ];
 
   return (
