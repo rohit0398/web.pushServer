@@ -3,69 +3,20 @@
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { Button, CustomCheckbox, InputField, Loader } from '@/atoms';
+import { Button, Loader } from '@/atoms';
 import ConfirmationModal from '@/atoms/confirmationModal';
-import MultiSelectSearch from '@/atoms/multiSelectedSearch';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
+import { CreateCampaign } from '@/molecules/createCampaign';
 import api from '@/utils/api';
-import {
-  Browsers,
-  Countries,
-  Devices,
-  Os,
-  PopularLanguages,
-} from '@/utils/consts';
-import {
-  convertOptionsToValues,
-  convertValuesToOptions,
-  convertValuesToOptionsDaysHours,
-  resetDaysHours,
-  wentWrong,
-} from '@/utils/helper';
-
-interface FormData {
-  hours: {
-    [key: number]: boolean;
-  };
-  days: {
-    [key: string]: boolean;
-  };
-  countries: {
-    [key: string]: string;
-  }[];
-  feeds: {
-    [key: string]: string;
-  }[];
-  languages: {
-    [key: string]: string;
-  }[];
-  browsers: {
-    [key: string]: string;
-  }[];
-  devices: {
-    [key: string]: string;
-  }[];
-  os: {
-    [key: string]: string;
-  }[];
-  subscriptionFrom: string;
-  subscriptionTo: string;
-  random: string;
-  frequency: string;
-  title: string;
-  _id: string;
-}
-
-const segmentHeading = `text-xl font-semibold text-gray`;
-const labelClass = ` text-medium-gray font-medium mb-2`;
+import { wentWrong } from '@/utils/helper';
 
 export default function Campaign() {
   const [create, setCreate] = useState(false);
   const [data, setData] = useState([]);
+  const [singleRowData, setSingleRowData] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
   const [deletingObj, setDeletingObj] = useState<{ ind: number; _id: string }>({
@@ -73,18 +24,6 @@ export default function Campaign() {
     _id: '',
   });
 
-  const { register, handleSubmit, formState, control, reset } =
-    useForm<FormData>({
-      defaultValues: {
-        subscriptionFrom: '0',
-        subscriptionTo: '0',
-        random: '0',
-        frequency: '0',
-        hours: resetDaysHours('hours'),
-        days: resetDaysHours(),
-      },
-    });
-  // Initialize the form field with an empty array
   useEffect(() => {
     setLoading(true);
     api
@@ -115,64 +54,9 @@ export default function Campaign() {
   }
 
   function handelEdit(singleRow: any) {
-    const raw = { ...singleRow };
     setCreate(true);
-    raw.days = convertValuesToOptionsDaysHours(raw.days);
-    raw.hours = convertValuesToOptionsDaysHours(raw.hours, 'hours');
-    raw.countries = convertValuesToOptions(raw.countries);
-    raw.languages = convertValuesToOptions(raw.languages);
-    raw.browsers = convertValuesToOptions(raw.browsers);
-    raw.devices = convertValuesToOptions(raw.devices);
-    raw.os = convertValuesToOptions(raw.os);
-    raw.feeds = convertValuesToOptions(raw.feeds);
-    reset(raw);
+    setSingleRowData(singleRow);
   }
-
-  async function handleCancelCreate() {
-    reset({
-      subscriptionFrom: '0',
-      subscriptionTo: '0',
-      random: '0',
-      frequency: '0',
-      title: '',
-      hours: resetDaysHours('hours'),
-      days: resetDaysHours(),
-    });
-    setCreate(false);
-  }
-
-  const onSubmit = async (values: FormData) => {
-    const raw: any = { ...values };
-    const days = Object.entries(raw.days)
-      .map(([key, value]: any) => {
-        return value ? key : undefined;
-      })
-      .filter((val) => val);
-    const hours = Object.entries(raw.hours)
-      .map(([key, value]: any) => {
-        return value ? key : undefined;
-      })
-      .filter((val) => val);
-
-    raw.days = days.length === 7 ? ([] as any) : days;
-    raw.hours = hours.length === 24 ? ([] as any) : hours;
-    raw.countries = convertOptionsToValues(raw.countries);
-    raw.languages = convertOptionsToValues(raw.languages);
-    raw.browsers = convertOptionsToValues(raw.browsers);
-    raw.devices = convertOptionsToValues(raw.devices);
-    raw.os = convertOptionsToValues(raw.os);
-    raw.feeds = convertOptionsToValues(raw.feeds);
-
-    try {
-      setLoading(true);
-      if (raw?._id) await api.patch('/campaign', raw);
-      else await api.post('/campaign', raw);
-      toast.success('Campaign created successfully');
-      setLoading(false);
-    } catch (_err) {
-      toast.error(wentWrong);
-    }
-  };
 
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
@@ -283,217 +167,24 @@ export default function Campaign() {
           {loading && <Loader />}
           <div className=" mb-8 flex justify-between">
             <h2 className="text-3xl font-semibold text-gray">Campaign</h2>
-            <Button title="create" onClick={() => setCreate(true)} />
+
+            <Button
+              id={'pushNotificationButton'}
+              title="create"
+              onClick={() => setCreate(true)}
+            />
           </div>
           <div>
             <CustomTable columns={columns} data={data} />
           </div>
           {create && (
-            <div
-              className={`absolute inset-x-0 top-0 z-20 bg-white p-3 sm:p-10`}
-            >
-              <div className=" flex justify-between">
-                <h2 className="text-3xl font-semibold text-gray">
-                  Create Campaign
-                </h2>
-
-                <Button
-                  title="Cancel"
-                  variant="out-lined"
-                  onClick={handleCancelCreate}
-                />
-              </div>
-              <form
-                className="mt-4 space-y-6"
-                onSubmit={handleSubmit(onSubmit)}
-              >
-                <div className="flex flex-col">
-                  <label htmlFor="title" className={labelClass}>
-                    Title
-                  </label>
-                  <InputField
-                    name="title"
-                    type="text"
-                    placeholder="Type here"
-                    register={register}
-                    formState={formState}
-                    rules={{
-                      required: 'This is a required field.',
-                    }}
-                  />
-                </div>
-                <hr className="mb-4 mt-6 border-t" />
-
-                <h5 className={segmentHeading}>Targeting options</h5>
-
-                <MultiSelectSearch
-                  options={[]}
-                  control={control}
-                  name="feeds"
-                  label="Feeds"
-                  error={formState?.errors?.feeds}
-                />
-                <MultiSelectSearch
-                  options={PopularLanguages}
-                  control={control}
-                  name="languages"
-                  label="Language"
-                  error={formState?.errors?.languages}
-                />
-
-                <MultiSelectSearch
-                  options={Countries}
-                  control={control}
-                  name="countries"
-                  label="Countries"
-                  error={formState?.errors?.countries}
-                />
-                <MultiSelectSearch
-                  options={Browsers}
-                  control={control}
-                  name="browsers"
-                  label="Browsers"
-                  error={formState?.errors?.browsers}
-                />
-
-                <MultiSelectSearch
-                  options={Devices}
-                  control={control}
-                  name="devices"
-                  label="Devices"
-                  error={formState?.errors?.devices}
-                />
-
-                <MultiSelectSearch
-                  options={Os}
-                  control={control}
-                  name="os"
-                  label="OS"
-                  error={formState?.errors?.os}
-                />
-
-                <div className="">
-                  <div className={labelClass}>Subscription period</div>
-                  <div className="">
-                    <div className=" flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-                      <span>From</span>
-                      <InputField
-                        name="subscriptionFrom"
-                        type="number"
-                        placeholder="0"
-                        register={register}
-                        formState={formState}
-                        rules={{
-                          required: 'This is a required field.',
-                        }}
-                      />
-
-                      <span>hours to</span>
-
-                      <InputField
-                        name="subscriptionTo"
-                        type="number"
-                        placeholder="23"
-                        register={register}
-                        formState={formState}
-                        rules={{
-                          required: 'This is a required field.',
-                        }}
-                      />
-                      <span>hours</span>
-                    </div>
-                  </div>
-                </div>
-
-                <hr className="mb-4 mt-6 border-t" />
-
-                <div className="">
-                  <div className={labelClass}>
-                    Send random
-                    <span className="" aria-label="question-circle" />
-                  </div>
-                  <div className=" flex">
-                    <InputField
-                      name="random"
-                      type="number"
-                      placeholder="0"
-                      register={register}
-                      formState={formState}
-                      rules={{
-                        required: 'This is a required field.',
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="">
-                  <div className={labelClass}>
-                    Creatives frequency, hours
-                    <span className="" aria-label="question-circle" />
-                  </div>
-                  <div className=" flex">
-                    <InputField
-                      name="frequency"
-                      type="number"
-                      placeholder="0"
-                      register={register}
-                      formState={formState}
-                      rules={{
-                        required: 'This is a required field.',
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <hr className="mb-4 mt-6 border-t" />
-                <div className={segmentHeading}>Time schedule</div>
-
-                <div className="mt-6 space-y-4">
-                  <div>
-                    <h3 className={labelClass}>Target Hours</h3>
-                    <div className="grid grid-cols-4  space-y-2 sm:grid-cols-8">
-                      {[...Array(24)].map((_, ind) => (
-                        <CustomCheckbox
-                          key={ind}
-                          label={`${ind}`}
-                          name={`hours[${ind}]`}
-                          register={register}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className={labelClass}>Target Days</h3>
-                    <div className="grid grid-cols-2 space-y-2 sm:grid-cols-4">
-                      {[
-                        'Monday',
-                        'Tuesday',
-                        'Wednesday',
-                        'Thursday',
-                        'Friday',
-                        'Saturday',
-                        'Sunday',
-                      ].map((day) => (
-                        <CustomCheckbox
-                          key={day}
-                          label={day}
-                          name={`days[${day}]`}
-                          register={register}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className=" !mt-16">
-                  <Button
-                    type={'submit'}
-                    title="Save"
-                    paddingMargin="px-5 lg:px-16"
-                  />
-                </div>
-              </form>
-            </div>
+            <CreateCampaign
+              singleRowData={singleRowData}
+              setCreate={(bool) => {
+                setCreate(bool);
+                setSingleRowData({});
+              }}
+            />
           )}
           <ConfirmationModal
             isOpen={confirmModal}

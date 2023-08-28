@@ -6,5 +6,5 @@ export { CustomCheckbox } from '@/atoms/input/CustomCheckbox';
 export { Loader } from '@/atoms/loader';
 export { Modal } from '@/atoms/modal';
 export { Pagination } from '@/atoms/pagination';
-export { Select } from '@/atoms/select';
+export { SelectSearch } from '@/atoms/select';
 export { TooltipContainer } from '@/atoms/tooptip';

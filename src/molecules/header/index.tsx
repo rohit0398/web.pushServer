@@ -50,7 +50,7 @@ export function Header() {
         </button>
       </div>
       {(isOpen || isLarge) && (
-        <ul className="absolute inset-x-0 top-[5.75rem] z-50 flex flex-col gap-6 rounded-b-2xl bg-dark-purple p-4 sm:relative sm:top-0">
+        <ul className="absolute inset-x-0 top-[5.75rem] z-20 flex flex-col gap-6 rounded-b-2xl bg-dark-purple p-4 sm:relative sm:top-0">
           {navs.map((val, ind) => (
             <li key={ind}>
               <CustomLink

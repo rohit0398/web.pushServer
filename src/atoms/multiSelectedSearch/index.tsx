@@ -6,9 +6,10 @@ import Select from 'react-select';
 interface MultiSelectSearchProps<Option> {
   options: SelectProps<Option>['options'];
   name: string;
-  label: string;
+  label?: string;
   control: any;
   error: any;
+  placeholder?: string;
 }
 const MultiSelectSearch = <Option extends { label: string; value: string }>({
   options,
@@ -16,12 +17,15 @@ const MultiSelectSearch = <Option extends { label: string; value: string }>({
   label,
   control,
   error,
+  placeholder,
 }: MultiSelectSearchProps<Option>) => {
   return (
     <div className="mb-4">
-      <label htmlFor={name} className=" mb-2 font-medium text-medium-gray">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={name} className=" mb-2 font-medium text-medium-gray">
+          {label}
+        </label>
+      )}
       <Controller
         name={name}
         control={control}
@@ -31,6 +35,7 @@ const MultiSelectSearch = <Option extends { label: string; value: string }>({
             isMulti
             inputId={name}
             instanceId={name}
+            placeholder={placeholder}
             className={`rounded-md shadow-sm focus:ring ${
               error?.[name] ? 'border-red-500' : 'border-light-gray'
             }`}

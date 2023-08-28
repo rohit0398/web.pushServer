@@ -13,6 +13,7 @@ type IProps = {
   onClick?: () => void;
   rounded?: string;
   type?: any;
+  id?: string;
 };
 export function Button({
   title,
@@ -25,6 +26,7 @@ export function Button({
   onClick,
   rounded = 'rounded lg:rounded-lg',
   type = 'button',
+  id,
 }: IProps) {
   function buttonVarient(uiVarient: IButtonVarient) {
     switch (uiVarient) {
@@ -48,6 +50,7 @@ export function Button({
   }
   return (
     <button
+      id={id}
       onClick={onClick}
       className={buttonVarient(variant)}
       disabled={disabled}
