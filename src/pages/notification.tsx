@@ -12,7 +12,7 @@ export default function Notification() {
   function handleSend() {
     setLoading(true);
     api
-      .get(`/subscription/send?limit=1`)
+      .get(`/subscription/send?limit=10`)
       .then(() => toast.success('Notification send successfully'))
       .catch(() => toast.error(wentWrong))
       .finally(() => setLoading(false));
