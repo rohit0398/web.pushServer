@@ -13,7 +13,8 @@
     "check-lint": "eslint . --ext ts --ext tsx --ext js --fix",
     "build-types": "tsc --noEmit --pretty",
     "test": "jest --watch",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "start:pm2": "pm2 start npm --name pushserver -- start"
   },
   "dependencies": {
     "@faker-js/faker": "^8.0.2",
