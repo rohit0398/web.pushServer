@@ -80,39 +80,60 @@ export function getCroppedCanvas(
   mimeType: string,
 ): Promise<Blob | null> {
   return new Promise((resolve) => {
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    const pixelCrop = {
-      x: crop.x * scaleX,
-      y: crop.y * scaleY,
-      width: crop.width * scaleX,
-      height: crop.height * scaleY,
-    };
-
     const canvas = document.createElement('canvas');
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
-
     const ctx = canvas.getContext('2d');
-
     if (!ctx) {
       resolve(null);
       return;
     }
 
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+
+    const pixelRatio = window.devicePixelRatio;
+
+    canvas.width = Math.floor(crop.width * scaleX * pixelRatio);
+    canvas.height = Math.floor(crop.height * scaleY * pixelRatio);
+
+    ctx.scale(pixelRatio, pixelRatio);
+    ctx.imageSmoothingQuality = 'high';
+
+    const cropX = crop.x * scaleX;
+    const cropY = crop.y * scaleY;
+
+    const centerX = image.naturalWidth / 2;
+    const centerY = image.naturalHeight / 2;
+
+    ctx.save();
+
+    // 5) Move the crop origin to the canvas origin (0,0)
+    ctx.translate(-cropX, -cropY);
+    // 4) Move the origin to the center of the original position
+    ctx.translate(centerX, centerY);
+    // 1) Move the center of the image to the origin (0,0)
+    ctx.translate(-centerX, -centerY);
     ctx.drawImage(
       image,
-      pixelCrop.x,
-      pixelCrop.y,
-      pixelCrop.width,
-      pixelCrop.height,
       0,
       0,
-      pixelCrop.width,
-      pixelCrop.height,
+      image.naturalWidth,
+      image.naturalHeight,
+      0,
+      0,
+      image.naturalWidth,
+      image.naturalHeight,
     );
 
     canvas.toBlob((blob) => {
+      // const url = URL.createObjectURL(blob);
+      // // Create an anchor element for the download link
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = "cropped-image.png";
+      // // Simulate a click event to trigger the download
+      // a.click();
+      // // Release the URL object to free up resources
+      // URL.revokeObjectURL(url);
       resolve(blob);
     }, mimeType);
   });
@@ -125,6 +146,39 @@ const updateDeniedUrl = "UPDATE_DENIED_URL"
 </script>
 <script src=${process?.env?.NEXT_PUBLIC_API_URL}/api/v1/script/push-notification-script.js >
 </script>`;
+
+export const serviceWorkerStr = `
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("push", (e) => {
+  try {
+    let payload = e.data.text(); // Extract payload from event data
+    console.log("test payload", payload);
+
+    payload = JSON.parse(payload); // Parse the payload as JSON
+    const { url, buttonTitle, buttonUrl } = payload ?? {};
+    const options = { ...payload, requireInterations: true };
+    if (buttonTitle && buttonUrl)
+      options.actions = [{ action: "buttonClick", title: buttonTitle }];
+    options.data = { url, buttonUrl };
+
+    e.waitUntil(
+      self.registration.showNotification(payload?.title ?? "", options)
+    );
+  } catch (error) {
+    console.error("Error parsing payload:", error);
+    return;
+  }
+});
+
+self.addEventListener("notificationclick", (e) => {
+  let payload = e?.notification?.data ?? {};
+  if (e.action === "buttonClick") clients.openWindow(payload?.buttonUrl);
+  else clients.openWindow(payload?.url);
+});
+`;
 
 type IupdateScriptString = {
   UPDATE_SUCCESS_URL?: string;

@@ -438,14 +438,14 @@ export function CreateCampaign({
                   <div className="max-h-52 w-full overflow-hidden rounded-t-xl">
                     <img
                       alt="img"
-                      src={val?.bodyImage}
+                      src={val?.image}
                       className=" w-full border border-stroke-light-gray object-cover"
                     />
                   </div>
                   <div className=" flex items-center gap-4 border border-stroke-light-gray p-4">
                     <img
                       alt="img"
-                      src={val?.previewImage}
+                      src={val?.icon}
                       className=" max-h-10 max-w-[4rem] overflow-hidden rounded object-cover"
                     />
                     <div className=" text-base font-semibold text-gray">

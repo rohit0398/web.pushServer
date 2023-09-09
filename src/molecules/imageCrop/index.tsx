@@ -1,15 +1,18 @@
 import 'react-image-crop/dist/ReactCrop.css';
 
-import React, { useCallback, useState } from 'react';
-import type { Crop } from 'react-image-crop';
+import React, { useCallback, useRef, useState } from 'react';
+import type { Crop, PixelCrop } from 'react-image-crop';
 import ReactCrop from 'react-image-crop';
+
+import { useDebounceEffect } from '@/hooks/useDebounceEffect';
+import { getCroppedCanvas } from '@/utils/helper';
 
 interface ReusableReactCropProps {
   src: string;
   aspectRatio: number;
   width: number;
   height: number;
-  onCropComplete: (crop: Crop) => void;
+  onCropComplete: (cropedFile: File) => void;
 }
 
 const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
@@ -19,6 +22,9 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
   width,
   height,
 }) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+
   const [crop, setCrop] = useState<Crop>({
     unit: 'px',
     x: 0,
@@ -31,24 +37,41 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
     setCrop(newCrop);
   }, []);
 
-  const handleCropCompleted = useCallback(
-    (completedCrop: Crop) => {
-      onCropComplete(completedCrop);
+  useDebounceEffect(
+    async () => {
+      if (completedCrop?.width && completedCrop?.height && imgRef.current) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        const imageBlob = await getCroppedCanvas(
+          imgRef.current,
+          completedCrop,
+          'image/png',
+        );
+        if (imageBlob) {
+          const file = new File([imageBlob], 'cropped-image.png', {
+            type: 'image/png',
+          });
+          onCropComplete(file);
+        }
+      }
     },
-    [onCropComplete],
+    100,
+    [completedCrop],
   );
-
   return (
     <ReactCrop
       crop={crop}
       onChange={handleCropChange}
-      onComplete={handleCropCompleted}
+      onComplete={(c) => setCompletedCrop(c)}
       aspect={aspectRatio}
       locked={true} // Set the fixed aspect ratio
-      ruleOfThirds={true}
-      style={{ width: width + 16, height: height + 16 }}
+      style={{ width: width + width * 0.1, height: height + height * 0.1 }}
     >
-      <img alt="Crop me" src={src} />
+      <img
+        ref={imgRef}
+        alt="Crop me"
+        src={src}
+        className=" object-contain object-center"
+      />
     </ReactCrop>
   );
 };

@@ -94,7 +94,7 @@ export default function AddCreative() {
         },
       },
       {
-        accessorKey: 'previewImage',
+        accessorKey: 'icon',
         header: 'Preview Image',
         enableColumnFilter: false,
         cell: ({ row }) => {
@@ -102,15 +102,15 @@ export default function AddCreative() {
             <div className=" my-2 max-h-24 max-w-[12rem] overflow-hidden rounded-md">
               <img
                 alt="pImage"
-                src={row?.getValue('previewImage')}
-                className=" h-full w-full object-contain "
+                src={row?.getValue('icon')}
+                className=" h-full max-h-24 w-full max-w-[12rem] object-contain"
               />
             </div>
           );
         },
       },
       {
-        accessorKey: 'bodyImage',
+        accessorKey: 'image',
         header: 'Body Image',
         enableColumnFilter: false,
         cell: ({ row }) => {
@@ -118,8 +118,8 @@ export default function AddCreative() {
             <div className=" my-2 max-h-20 max-w-[10rem] overflow-hidden rounded-md">
               <img
                 alt="bImage"
-                src={row?.getValue('bodyImage')}
-                className=" h-full w-full object-contain "
+                src={row?.getValue('image')}
+                className=" h-full max-h-20 w-full max-w-[10rem] object-contain"
               />
             </div>
           );

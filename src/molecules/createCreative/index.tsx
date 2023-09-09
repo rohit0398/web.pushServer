@@ -4,12 +4,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { Crop } from 'react-image-crop';
 import { toast } from 'react-toastify';
 
 import { Button, InputField, Modal } from '@/atoms';
 import api from '@/utils/api';
-import { getCroppedCanvas, wentWrong } from '@/utils/helper';
+import { wentWrong } from '@/utils/helper';
 
 import ReusableReactCrop from '../imageCrop';
 
@@ -24,11 +23,6 @@ type FormData = {
   campaignId: string;
   _id?: string;
 };
-
-interface ImageState {
-  selectedFile: File | undefined;
-  imgSrc: string | ArrayBuffer | null;
-}
 
 export function CreateCreative({
   show,
@@ -45,14 +39,10 @@ export function CreateCreative({
 }) {
   const [actionButton, setActionButton] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState<ImageState>({
-    selectedFile: undefined,
-    imgSrc: null,
-  });
-  const [bodyImages, setBodyImages] = useState<ImageState>({
-    selectedFile: undefined,
-    imgSrc: null,
-  });
+  const [iconImgSrc, setIconImgSrc] = useState<string>();
+  const [imageSrc, setBodyImages] = useState<string>();
+  const [iconImg, setIconImg] = useState<any>();
+  const [image, setImage] = useState<any>();
 
   const { register, handleSubmit, formState, reset } = useForm<FormData>();
 
@@ -63,51 +53,20 @@ export function CreateCreative({
     }
   }, [singleRowData]);
 
-  const handleCropComplete = useCallback(
-    async (crop: Crop, isPreviewImage: boolean) => {
-      const imagesState = isPreviewImage ? images : bodyImages;
-      if (imagesState.imgSrc && crop.width && crop.height) {
-        const image = new Image();
-        image.src = imagesState.imgSrc as string;
-
-        image.onload = async () => {
-          const imageBlob = await getCroppedCanvas(image, crop, 'image/png');
-          if (imageBlob) {
-            const file = new File([imageBlob], 'cropped-image.png', {
-              type: 'image/png',
-            });
-            /* eslint-disable-next-line no-console */
-            console.log('file', file);
-          }
-        };
-      }
-    },
-    [images, bodyImages],
-  );
-
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, isPreviewImage: boolean) => {
-      const imagesState = isPreviewImage ? images : bodyImages;
       if (event.target.files && event.target.files.length > 0) {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.addEventListener('load', () =>
           isPreviewImage
-            ? setImages({
-                ...imagesState,
-                selectedFile: file,
-                imgSrc: reader.result?.toString() || null,
-              })
-            : setBodyImages({
-                ...imagesState,
-                selectedFile: file,
-                imgSrc: reader.result?.toString() || null,
-              }),
+            ? setIconImgSrc(reader.result?.toString() as string)
+            : setBodyImages(reader.result?.toString() as string),
         );
         reader.readAsDataURL(file as File);
       }
     },
-    [images, bodyImages],
+    [iconImgSrc, imageSrc],
   );
 
   async function handleCancelCreate() {
@@ -127,18 +86,26 @@ export function CreateCreative({
 
   const onSubmit = async (values: FormData) => {
     setLoading(true);
-    values.bodyImage =
-      'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=328&ixid=MnwxfDB8MXxyYW5kb218MHx8c2FsZXx8fHx8fDE2OTIxMDY2NzE&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=492' as any;
-    values.previewImage =
-      'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=196&ixid=MnwxfDB8MXxyYW5kb218MHx8c2FsZXx8fHx8fDE2OTIxMDY2NzE&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=196' as any;
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(values)) {
+      formData.set(key, value as any);
+    }
 
-    values.campaignId = campaignId ?? '';
+    formData.set('campaignId', campaignId ?? '');
+    formData.set('icon', iconImg as Blob);
+    formData.set('image', image as Blob);
+
     try {
       setLoading(true);
       let creative;
       if (values?._id)
-        creative = await api.patch(`/creative/${values?._id}`, values);
-      else creative = await api.post('/creative', values);
+        creative = await api.patch(`/creative/${values?._id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      else
+        creative = await api.post('/creative', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
       toast.success('Creative created successfully');
       setLoading(false);
       handleSuccess?.(creative?.data);
@@ -200,13 +167,13 @@ export function CreateCreative({
             </div>
 
             <div className=" flex justify-start">
-              {images.selectedFile && (
+              {iconImgSrc && (
                 <ReusableReactCrop
-                  src={images.imgSrc as string}
+                  src={iconImgSrc as string}
                   aspectRatio={1}
                   width={196}
                   height={196}
-                  onCropComplete={(crop) => handleCropComplete(crop, true)}
+                  onCropComplete={(cropedFile) => setIconImg(cropedFile)}
                 />
               )}
             </div>
@@ -252,13 +219,13 @@ export function CreateCreative({
             </div>
 
             <div className=" flex justify-start">
-              {bodyImages.selectedFile && (
+              {imageSrc && (
                 <ReusableReactCrop
-                  src={bodyImages.imgSrc as string}
+                  src={imageSrc as string}
                   aspectRatio={492 / 328}
                   width={492}
                   height={328}
-                  onCropComplete={(crop) => handleCropComplete(crop, false)}
+                  onCropComplete={(cropedFile) => setImage(cropedFile)}
                 />
               )}
             </div>

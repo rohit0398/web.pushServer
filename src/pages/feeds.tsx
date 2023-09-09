@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -10,7 +10,11 @@ import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import api from '@/utils/api';
-import { updateScriptString, wentWrong } from '@/utils/helper';
+import {
+  serviceWorkerStr,
+  updateScriptString,
+  wentWrong,
+} from '@/utils/helper';
 
 type FormData = {
   allowRedirectUrl: string;
@@ -23,7 +27,6 @@ type FormData = {
 };
 
 export default function Feeds() {
-  const scriptRef = useRef(null);
   const [scriptToCopy, setScriptToCopy] = useState('');
   const [create, setCreate] = useState(false);
   const [data, setData] = useState([]);
@@ -49,6 +52,10 @@ export default function Feeds() {
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(scriptToCopy);
+  };
+
+  const handleCopyToClipboard2 = () => {
+    navigator.clipboard.writeText(serviceWorkerStr);
   };
 
   function handleDelete({ ind, _id }: { ind: number; _id: string }) {
@@ -264,9 +271,11 @@ export default function Feeds() {
                 </div>
                 {scriptToCopy && (
                   <div className="">
+                    <div>
+                      {`Copy and paste this code in index.html for relative file`}
+                    </div>
                     <textarea
                       contentEditable={false}
-                      ref={scriptRef}
                       value={scriptToCopy}
                       readOnly
                       className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
@@ -274,6 +283,24 @@ export default function Feeds() {
 
                     <Button
                       onClick={handleCopyToClipboard}
+                      variant="out-lined"
+                      title="Copy Script To Clipboard"
+                    />
+
+                    <div className=" mt-10">
+                      <div>
+                        {`Create file "serviceWorker.js" in your public folder or
+                        root directory and paste this code.`}
+                      </div>
+                      <textarea
+                        contentEditable={false}
+                        value={serviceWorkerStr}
+                        readOnly
+                        className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleCopyToClipboard2}
                       variant="out-lined"
                       title="Copy Script To Clipboard"
                     />

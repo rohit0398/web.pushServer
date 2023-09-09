@@ -3,21 +3,17 @@ self.addEventListener("install", () => {
 });
 
 self.addEventListener("push", (e) => {
-  console.log("push e", e);
-  let payload = e.data.text(); // Extract payload from event data
-
   try {
+    let payload = e.data.text(); // Extract payload from event data
+    console.log("test payload", payload);
+
     payload = JSON.parse(payload); // Parse the payload as JSON
-    console.log("payload", payload);
-    const { previewImage, bodyImage, url, buttonTitle, buttonUrl } = payload ?? {}
-    const options = {...payload, requireInterations: true };
+    const { url, buttonTitle, buttonUrl } = payload ?? {};
+    const options = { ...payload, requireInterations: true };
     if (buttonTitle && buttonUrl)
       options.actions = [{ action: "buttonClick", title: buttonTitle }];
-    if (previewImage) options.icon = payload?.previewImage;
-    if (bodyImage) options.image = payload?.bodyImage;
     options.data = { url, buttonUrl };
 
-    console.log("optid", options);
     e.waitUntil(
       self.registration.showNotification(payload?.title ?? "", options)
     );
