@@ -144,7 +144,7 @@ const feedId = "UPDATE_FEEDID";
 const successUrl = "UPDATE_SUCCESS_URL"
 const updateDeniedUrl = "UPDATE_DENIED_URL"
 </script>
-<script src=${process?.env?.NEXT_PUBLIC_API_URL}/api/v1/script/push-notification-script.js >
+<script src=${process?.env?.NEXT_PUBLIC_API_URL}/scripts/pushNotificationScript.js >
 </script>`;
 
 export const serviceWorkerStr = `
