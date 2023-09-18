@@ -206,7 +206,6 @@ export function CreateCreative({
                           ) || 'Unsupported file format'
                         : true;
                     },
-
                     fileSize: (value: any) =>
                       value[0]?.type
                         ? value[0]?.size < 1024 * 1024 * 5 ||

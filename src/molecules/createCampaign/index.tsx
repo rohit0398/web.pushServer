@@ -218,7 +218,7 @@ export function CreateCampaign({
 
     try {
       setLoading(true);
-      if (raw?._id) await api.patch('/campaign', raw);
+      if (raw?._id) await api.patch(`/campaign/${raw?._id}`, raw);
       else await api.post('/campaign', raw);
       toast.success('Campaign created successfully');
       setLoading(false);
