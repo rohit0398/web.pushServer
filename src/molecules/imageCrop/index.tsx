@@ -1,6 +1,6 @@
 import 'react-image-crop/dist/ReactCrop.css';
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { Crop, PixelCrop } from 'react-image-crop';
 import ReactCrop from 'react-image-crop';
 
@@ -37,26 +37,35 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
     setCrop(newCrop);
   }, []);
 
+  useEffect(() => {
+    if (crop) croppedByCanvas(crop);
+  }, []);
+
+  async function croppedByCanvas(details: any) {
+    if (details?.width && details?.height && imgRef.current) {
+      // We use canvasPreview as it's much faster than imgPreview.
+      const imageBlob = await getCroppedCanvas(
+        imgRef.current,
+        details,
+        'image/png',
+      );
+      if (imageBlob) {
+        const file = new File([imageBlob], 'cropped-image.png', {
+          type: 'image/png',
+        });
+        onCropComplete(file);
+      }
+    }
+  }
+
   useDebounceEffect(
     async () => {
-      if (completedCrop?.width && completedCrop?.height && imgRef.current) {
-        // We use canvasPreview as it's much faster than imgPreview.
-        const imageBlob = await getCroppedCanvas(
-          imgRef.current,
-          completedCrop,
-          'image/png',
-        );
-        if (imageBlob) {
-          const file = new File([imageBlob], 'cropped-image.png', {
-            type: 'image/png',
-          });
-          onCropComplete(file);
-        }
-      }
+      croppedByCanvas(completedCrop);
     },
     100,
     [completedCrop],
   );
+
   return (
     <ReactCrop
       crop={crop}

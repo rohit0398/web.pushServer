@@ -135,7 +135,7 @@ export function CreateCreative({
                   Upload Preview Image
                 </div>
                 <div className="text-start text-sm font-semibold text-light-gray">
-                  Size: 196x196px
+                  Size: 192x192px
                 </div>
               </div>
 
@@ -171,8 +171,8 @@ export function CreateCreative({
                 <ReusableReactCrop
                   src={iconImgSrc as string}
                   aspectRatio={1}
-                  width={196}
-                  height={196}
+                  width={192}
+                  height={192}
                   onCropComplete={(cropedFile) => setIconImg(cropedFile)}
                 />
               )}
@@ -185,7 +185,7 @@ export function CreateCreative({
                   Upload Body Image
                 </div>
                 <div className="text-start text-sm font-semibold text-light-gray">
-                  Size: 492x328px
+                  Size: 720x480px
                 </div>
               </div>
 
@@ -221,9 +221,9 @@ export function CreateCreative({
               {imageSrc && (
                 <ReusableReactCrop
                   src={imageSrc as string}
-                  aspectRatio={492 / 328}
-                  width={492}
-                  height={328}
+                  aspectRatio={720 / 480}
+                  width={720}
+                  height={480}
                   onCropComplete={(cropedFile) => setImage(cropedFile)}
                 />
               )}
