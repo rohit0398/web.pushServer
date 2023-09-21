@@ -28,3 +28,19 @@ self.addEventListener("notificationclick", (e) => {
   if (e.action === "buttonClick") clients.openWindow(payload?.buttonUrl);
   else clients.openWindow(payload?.url);
 });
+
+self.addEventListener("notificationdisplay", (event) => {
+  console.log("notificationdisplay", event);
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleString();
+  console.log(formattedDate);
+  // Log the event or send data to your server
+});
+
+self.addEventListener("notificationclose", (event) => {
+  console.log("notificationclose", event);
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleString();
+  console.log(formattedDate);
+  // Handle notification close event, e.g., log the event
+});
