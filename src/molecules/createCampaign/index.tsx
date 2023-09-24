@@ -74,6 +74,7 @@ export function CreateCampaign({
   const [feeds, setFeeds] = useState<{ label: string; value: string }[]>([]);
   const [creatives, setCreatives] = useState<any>([]);
   const [seletedCreative, setSelectedCreative] = useState({});
+  const [addFromExisting, setAddFromExisting] = useState(false);
   const [campaignCreatives, setCampaignCreatives] = useState<any>([]);
   const [deletingObj, setDeletingObj] = useState<{ ind: number; _id: string }>({
     ind: 0,
@@ -145,7 +146,7 @@ export function CreateCampaign({
     });
   }
 
-  function handelSelectExistingCreative(creative: any) {
+  function handelSelectExistingCreative(creative: any, fromExisting?: boolean) {
     const found =
       Array.isArray(creatives) &&
       creatives.find((val) => val?._id === creative?.value);
@@ -153,6 +154,7 @@ export function CreateCampaign({
     if (found) {
       setSelectedCreative(found);
       setCreateCreative(true);
+      if (fromExisting) setAddFromExisting(true);
     } else toast.error(wentWrong);
   }
 
@@ -489,7 +491,7 @@ export function CreateCampaign({
                   name="creatives"
                   label="Existing Creatives"
                   value={[]}
-                  onChange={handelSelectExistingCreative}
+                  onChange={(data) => handelSelectExistingCreative(data, true)}
                 />
               </div>
               <div className=" flex justify-center pt-2">
@@ -510,8 +512,10 @@ export function CreateCampaign({
         setShow={(bool) => {
           setCreateCreative(bool);
           setSelectedCreative({});
+          setAddFromExisting(false);
         }}
         handleSuccess={handleCreativeSuccess}
+        addFromExisting={addFromExisting}
       />
       <ConfirmationModal
         isOpen={confirmation}

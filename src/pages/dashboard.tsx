@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+import { get } from 'lodash';
+import { useEffect, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -10,93 +13,33 @@ import {
 } from 'recharts';
 
 import { Layout } from '@/layouts';
+import api from '@/utils/api';
 
 const segmentHeading = `text-xl font-semibold text-gray`;
 
 export default function Dashboard() {
-  const data = [
-    {
-      name: '07/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '08/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '09/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '10/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '11/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '12/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-    {
-      name: '13/07/23',
-      subscriptions: 5,
-      unsubscriptions: 2,
-      inactivations: 1,
-    },
-  ];
+  const [subscriptions, setSubscriptions] = useState<any>({});
+  const [campaigns, setCampaigns] = useState<any>({});
 
-  const data2 = [
-    {
-      name: '07/07/23',
-      LPClicks: 5,
-      Leads: 2,
-      Clicked: 1,
-      Closed: 1,
-      Shown: 1,
-      Sent: 1,
-    },
-    {
-      name: '08/07/23',
-      LPClicks: 5,
-      Leads: 2,
-      Clicked: 1,
-      Closed: 1,
-      Shown: 1,
-      Sent: 1,
-    },
-    {
-      name: '09/07/23',
-      LPClicks: 5,
-      Leads: 2,
-      Clicked: 1,
-      Closed: 1,
-      Shown: 1,
-      Sent: 1,
-    },
-    {
-      name: '10/07/23',
-      LPClicks: 5,
-      Leads: 2,
-      Clicked: 1,
-      Closed: 1,
-      Shown: 1,
-      Sent: 1,
-    },
-  ];
+  useEffect(() => {
+    api
+      .get('/analytics/subscribe')
+      .then((res) => {
+        setSubscriptions(res?.data ?? {});
+      })
+      .catch((err) => {
+        console.log('err', err);
+      });
+
+    api
+      .get('/analytics/campaign')
+      .then((res) => {
+        setCampaigns(res?.data ?? {});
+      })
+      .catch((err) => {
+        console.log('err', err);
+      });
+  }, []);
 
   return (
     <Layout>
@@ -113,29 +56,36 @@ export default function Dashboard() {
                 <div className=" font-semibold text-light-gray">
                   Active subscriptions
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {get(subscriptions?.active, '0.count')}
+                </div>
               </div>
 
               <div>
                 <div className=" font-semibold text-light-gray">
-                  Last 14 days (Unsub.%)
+                  Last 14 days Subscriptions
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {' '}
+                  {get(subscriptions?.last14days, '0.count', 0)}
+                </div>
               </div>
 
               <div>
                 <div className=" font-semibold text-light-gray">
-                  On the last active day (Unsub., %)
+                  Last 14 days Unscriptions
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {get(subscriptions?.last14days, '1.count', 0)}
+                </div>
               </div>
             </div>
-            <div className=" h-96 w-full">
+            <div className=" mt-10 h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   width={500}
                   height={300}
-                  data={data}
+                  data={subscriptions?.dates ?? []}
                   margin={{
                     top: 5,
                     right: 30,
@@ -150,7 +100,7 @@ export default function Dashboard() {
                   <Legend />
                   <Bar dataKey="subscriptions" fill="#8884d8" />
                   <Bar dataKey="unsubscriptions" fill="#82ca9d" />
-                  <Bar dataKey="inactivations" fill="#ffc658" />
+                  {/* <Bar dataKey="inactivations" fill="#ffc658" /> */}
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -167,50 +117,44 @@ export default function Dashboard() {
                 <div className=" font-semibold text-light-gray">
                   Sent in the last 14 days
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {campaigns?.last14days?.sent ?? 0}
+                </div>
               </div>
 
               <div>
                 <div className=" font-semibold text-light-gray">
                   Shown in the last 14 days
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {campaigns?.last14days?.shown ?? 0}
+                </div>
               </div>
 
               <div>
                 <div className=" font-semibold text-light-gray">
                   Clicked in the last 14 days
                 </div>
-                <div className=" text-base font-semibold">0</div>
+                <div className=" text-base font-semibold">
+                  {campaigns?.last14days?.clicked ?? 0}
+                </div>
               </div>
 
               <div>
                 <div className=" font-semibold text-light-gray">
                   Closed in the last 14 days
                 </div>
-                <div className=" text-base font-semibold">0</div>
-              </div>
-
-              <div>
-                <div className=" font-semibold text-light-gray">
-                  LPClicks in the last 14 days
+                <div className=" text-base font-semibold">
+                  {campaigns?.last14days?.closed ?? 0}
                 </div>
-                <div className=" text-base font-semibold">0</div>
-              </div>
-
-              <div>
-                <div className=" font-semibold text-light-gray">
-                  Leads in the last 14 days
-                </div>
-                <div className=" text-base font-semibold">0</div>
               </div>
             </div>
-            <div className=" h-96 w-full">
+            <div className=" mt-10 h-96 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   width={500}
                   height={300}
-                  data={data2}
+                  data={campaigns?.intervals ?? []}
                   margin={{
                     top: 5,
                     right: 30,
@@ -223,13 +167,13 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="LPClicks" fill="#8884d8" />
-                  <Bar dataKey="Leads" fill="#82ca9d" />
-                  <Bar dataKey="Clicked" fill="#ffc658" />
+                  {/* <Bar dataKey="LPClicks" fill="#8884d8" /> */}
+                  {/* <Bar dataKey="Leads" fill="#82ca9d" /> */}
+                  <Bar dataKey="clicked" fill="#ffc658" />
 
-                  <Bar dataKey="Closed" fill="#fa2070" />
-                  <Bar dataKey="Shown" fill="#fa0aea" />
-                  <Bar dataKey="Sent" fill="#00d0f5" />
+                  <Bar dataKey="closed" fill="#fa2070" />
+                  <Bar dataKey="shown" fill="#fa0aea" />
+                  <Bar dataKey="sent" fill="#00d0f5" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

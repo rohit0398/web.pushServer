@@ -15,6 +15,8 @@ import ReusableReactCrop from '../imageCrop';
 type FormData = {
   previewImage: FileList;
   bodyImage: FileList;
+  icon?: string;
+  image?: string;
   title: string;
   body: string;
   url: string;
@@ -30,12 +32,14 @@ export function CreateCreative({
   singleRowData,
   campaignId,
   handleSuccess,
+  addFromExisting,
 }: {
   show: boolean;
   setShow?: (bool: boolean) => void;
   singleRowData?: any;
   campaignId?: string;
   handleSuccess?: (data: any) => void;
+  addFromExisting?: boolean;
 }) {
   const [actionButton, setActionButton] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -88,21 +92,38 @@ export function CreateCreative({
     setLoading(true);
     const formData = new FormData();
     for (const [key, value] of Object.entries(values)) {
-      formData.set(key, value as any);
+      if (!(key === 'previewImage' || key === 'bodyImage'))
+        formData.set(key, value as any);
+    }
+
+    if (iconImg) {
+      formData.set('icon', iconImg as Blob);
+      if (values?.icon && typeof values?.icon === 'string')
+        formData.set('prevIcon', values?.icon);
+    }
+    if (image) {
+      formData.set('image', image as Blob);
+      if (values?.image && typeof values?.image === 'string')
+        formData.set('prevImage', values?.image);
     }
 
     formData.set('campaignId', campaignId ?? '');
-    formData.set('icon', iconImg as Blob);
-    formData.set('image', image as Blob);
 
     try {
       setLoading(true);
       let creative;
-      if (values?._id)
-        creative = await api.patch(`/creative/${values?._id}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-      else
+      if (values?._id) {
+        if (addFromExisting) {
+          formData.delete('_id');
+          formData.delete('createdAt');
+          creative = await api.post(`/creative`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } else
+          creative = await api.patch(`/creative/${values?._id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+      } else
         creative = await api.post('/creative', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
