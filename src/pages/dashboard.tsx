@@ -67,7 +67,7 @@ export default function Dashboard() {
                 </div>
                 <div className=" text-base font-semibold">
                   {' '}
-                  {get(subscriptions?.last14days, '0.count', 0)}
+                  {get(subscriptions?.last14days, 'subscriptions', 0)}
                 </div>
               </div>
 
@@ -76,7 +76,7 @@ export default function Dashboard() {
                   Last 14 days Unscriptions
                 </div>
                 <div className=" text-base font-semibold">
-                  {get(subscriptions?.last14days, '1.count', 0)}
+                  {get(subscriptions?.last14days, 'unsubscriptions', 0)}
                 </div>
               </div>
             </div>
