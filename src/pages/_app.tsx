@@ -19,7 +19,8 @@ const MyApp = ({ Component, ...rest }: AppProps) => {
       <Script id="pushNotificationScriptVariables">
         {`const feedId = "64e1def1904d2dddd111e049";
 const successUrl = "https://pushflow.net/index.html"
-const updateDeniedUrl = "https://dictionary.cambridge.org/dictionary/english/block"`}
+const deniedUrl = "https://dictionary.cambridge.org/dictionary/english/block"
+const postbackUrl = "https://trk.clickredirect.org/postback?cid={clickId}&et=pushsub"`}
       </Script>
     </Provider>
   );

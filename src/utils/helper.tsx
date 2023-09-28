@@ -139,14 +139,6 @@ export function getCroppedCanvas(
   });
 }
 
-const scriptStr = `<script>
-const feedId = "UPDATE_FEEDID";
-const successUrl = "UPDATE_SUCCESS_URL"
-const updateDeniedUrl = "UPDATE_DENIED_URL"
-</script>
-<script src=${process?.env?.NEXT_PUBLIC_API_URL}/scripts/pushNotificationScript.js >
-</script>`;
-
 export const serviceWorkerStr = `
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -220,22 +212,35 @@ self.addEventListener("notificationclose", (event) => {
 });
 `;
 
+const scriptStr = `<script>
+const feedId = "UPDATE_FEEDID";
+const successUrl = "UPDATE_SUCCESS_URL";
+const deniedUrl = "UPDATE_DENIED_URL";
+const postbackUrl = "UPDATE_POSTBACK_URL";
+</script>
+<script src=${process?.env?.NEXT_PUBLIC_API_URL}/scripts/pushNotificationScript.js >
+</script>`;
+
 type IupdateScriptString = {
   UPDATE_SUCCESS_URL?: string;
   UPDATE_DENIED_URL?: string;
   UPDATE_FEEDID?: string;
+  UPDATE_POSTBACK_URL?: string;
 };
 export function updateScriptString(obj: IupdateScriptString) {
   const updatingKeys = {
     UPDATE_SUCCESS_URL: '',
     UPDATE_DENIED_URL: '',
     UPDATE_FEEDID: '',
+    UPDATE_POSTBACK_URL: '',
     ...obj,
   };
+
   const regexPattern = new RegExp(
     `\\b(?:${Object.keys(updatingKeys).join('|')})\\b`,
     'gi',
   );
+
   const str = scriptStr.replace(regexPattern, (matched) => {
     return updatingKeys[matched as keyof IupdateScriptString];
   });

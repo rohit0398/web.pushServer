@@ -172,6 +172,7 @@ export default function AddCreative() {
               setShowModal(bool);
               setSingleRowData({});
             }}
+            campaignId={singleRowData?.campaignId}
           />
 
           <ConfirmationModal

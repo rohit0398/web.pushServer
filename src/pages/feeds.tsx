@@ -98,12 +98,13 @@ export default function Feeds() {
   }
 
   function handleSetScript(obj: any) {
-    const { allowRedirectUrl, blockRedirectUrl } = obj;
+    const { allowRedirectUrl, blockRedirectUrl, postbackUrl } = obj;
     setScriptToCopy(
       updateScriptString({
         UPDATE_SUCCESS_URL: allowRedirectUrl,
         UPDATE_DENIED_URL: blockRedirectUrl,
         UPDATE_FEEDID: obj?._id,
+        UPDATE_POSTBACK_URL: postbackUrl,
       }),
     );
   }
