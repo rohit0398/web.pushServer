@@ -92,7 +92,14 @@ export function CreateCreative({
     setLoading(true);
     const formData = new FormData();
     for (const [key, value] of Object.entries(values)) {
-      if (!(key === 'previewImage' || key === 'bodyImage'))
+      if (
+        !(
+          key === 'previewImage' ||
+          key === 'bodyImage' ||
+          key === 'icon' ||
+          key === 'image'
+        )
+      )
         formData.set(key, value as any);
     }
 
