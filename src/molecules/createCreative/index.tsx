@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-param-reassign */
 
+import { get } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -44,7 +45,7 @@ export function CreateCreative({
   const [actionButton, setActionButton] = useState(false);
   const [loading, setLoading] = useState(false);
   const [iconImgSrc, setIconImgSrc] = useState<string>();
-  const [imageSrc, setBodyImages] = useState<string>();
+  const [imageSrc, setImagSrc] = useState<string>();
   const [iconImg, setIconImg] = useState<any>();
   const [image, setImage] = useState<any>();
 
@@ -65,7 +66,7 @@ export function CreateCreative({
         reader.addEventListener('load', () =>
           isPreviewImage
             ? setIconImgSrc(reader.result?.toString() as string)
-            : setBodyImages(reader.result?.toString() as string),
+            : setImagSrc(reader.result?.toString() as string),
         );
         reader.readAsDataURL(file as File);
       }
@@ -83,9 +84,15 @@ export function CreateCreative({
       buttonUrl: '',
       bodyImage: undefined,
       previewImage: undefined,
+      icon: '',
+      image: '',
     });
     setShow?.(false);
     setActionButton(false);
+    setIconImgSrc('');
+    setImagSrc('');
+    setIconImg(null);
+    setImage(null);
   }
 
   const onSubmit = async (values: FormData) => {
@@ -121,8 +128,16 @@ export function CreateCreative({
       let creative;
       if (values?._id) {
         if (addFromExisting) {
+          const iconSplit = values?.icon && values.icon.split('/icons/');
+          const imageSplit = values?.image && values.image.split('/images/');
+          if (get(iconSplit, '[1]'))
+            formData.set('icon', `/icons/${get(iconSplit, '[1]')}` as any);
+          if (get(imageSplit, '[1]'))
+            formData.set('image', `/images/${get(imageSplit, '[1]')}` as any);
+
           formData.delete('_id');
           formData.delete('createdAt');
+
           creative = await api.post(`/creative`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
@@ -134,8 +149,13 @@ export function CreateCreative({
         creative = await api.post('/creative', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-      toast.success('Creative created successfully');
+      toast.success(
+        `Creative ${
+          values?._id && !addFromExisting ? 'updated' : 'created'
+        } successfully`,
+      );
       setLoading(false);
+      handleCancelCreate();
       handleSuccess?.(creative?.data);
     } catch (_err) {
       toast.error(wentWrong);
@@ -189,13 +209,18 @@ export function CreateCreative({
                           'File size exceeds 5MB'
                         : true,
                   }}
+                  rules={{
+                    required: singleRowData?._id
+                      ? undefined
+                      : 'File is required',
+                  }}
                   onChange={(e) => handleFileSelect(e, true)}
                 />
               </div>
             </div>
 
             <div className=" flex justify-start">
-              {iconImgSrc && (
+              {iconImgSrc ? (
                 <ReusableReactCrop
                   src={iconImgSrc as string}
                   aspectRatio={1}
@@ -203,6 +228,15 @@ export function CreateCreative({
                   height={192}
                   onCropComplete={(cropedFile) => setIconImg(cropedFile)}
                 />
+              ) : (
+                singleRowData?.icon &&
+                typeof singleRowData?.icon === 'string' && (
+                  <img
+                    src={singleRowData.icon}
+                    className=" aspect-[192/192] max-w-[12rem] object-cover"
+                    alt="uploadedimg"
+                  />
+                )
               )}
             </div>
 
@@ -240,13 +274,18 @@ export function CreateCreative({
                           'File size exceeds 5MB'
                         : true,
                   }}
+                  rules={{
+                    required: singleRowData?._id
+                      ? undefined
+                      : 'File is required',
+                  }}
                   onChange={(e) => handleFileSelect(e, false)}
                 />
               </div>
             </div>
 
             <div className=" flex justify-start">
-              {imageSrc && (
+              {imageSrc ? (
                 <ReusableReactCrop
                   src={imageSrc as string}
                   aspectRatio={720 / 480}
@@ -254,6 +293,15 @@ export function CreateCreative({
                   height={480}
                   onCropComplete={(cropedFile) => setImage(cropedFile)}
                 />
+              ) : (
+                singleRowData?.image &&
+                typeof singleRowData?.image === 'string' && (
+                  <img
+                    src={singleRowData.image}
+                    className=" aspect-[720/480] max-w-[30rem] object-cover"
+                    alt="uploadedimg"
+                  />
+                )
               )}
             </div>
 

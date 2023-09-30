@@ -2,7 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-param-reassign */
 
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import {
+  PauseIcon,
+  PencilIcon,
+  PlayIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 import type { ColumnDef } from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -17,9 +22,10 @@ import { wentWrong } from '@/utils/helper';
 
 export default function AddCreative() {
   const [showModal, setShowModal] = useState(false);
-  const [confirmModal, setConfirmModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [statusConfirm, setStatusConfirm] = useState(false);
   const [singleRowData, setSingleRowData] = useState<any>({});
-  const [deletingObj, setDeletingObj] = useState<{ ind: number; _id: string }>({
+  const [updateObj, setUpdateObj] = useState<{ ind: number; _id: string }>({
     ind: 0,
     _id: '',
   });
@@ -43,23 +49,49 @@ export default function AddCreative() {
   }
 
   function handleDelete({ ind, _id }: { ind: number; _id: string }) {
-    setDeletingObj({ ind, _id });
-    setConfirmModal(true);
+    setUpdateObj({ ind, _id });
+    setDeleteConfirm(true);
+  }
+
+  function handleStatusUpdate({ ind, _id }: { ind: number; _id: string }) {
+    setUpdateObj({ ind, _id });
+    setStatusConfirm(true);
   }
 
   function handelConfirm() {
     const raw = [...data];
-    raw.splice(deletingObj?.ind, 1);
-    setData(raw);
-    setConfirmModal(false);
+    raw.splice(updateObj?.ind, 1);
     setLoading(true);
     api
-      .delete(`/creative/${deletingObj?._id}`)
+      .delete(`/creative/${updateObj?._id}`)
       .then(() => {
+        setData(raw);
         toast.success('Creative deleted successfully');
       })
       .catch(() => toast.error(wentWrong))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setDeleteConfirm(false);
+      });
+  }
+
+  function handelStatusConfirm() {
+    const raw: any = [...data];
+    const status =
+      raw[updateObj.ind]?.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+    raw[updateObj.ind] = { ...raw[updateObj.ind], status };
+    setLoading(true);
+    api
+      .patch(`/creative/${updateObj?._id}`, { status })
+      .then(() => {
+        setData(raw);
+        toast.success('Creative status udpated successfully');
+      })
+      .catch(() => toast.error(wentWrong))
+      .finally(() => {
+        setLoading(false);
+        setStatusConfirm(false);
+      });
   }
 
   const columns = React.useMemo<ColumnDef<any>[]>(
@@ -126,25 +158,58 @@ export default function AddCreative() {
         },
       },
       {
+        accessorKey: 'status',
+        header: 'Status',
+        filterFn: 'includesString',
+        cell: ({ row }) => {
+          const val = row.getValue('status') as string;
+          return (
+            <div>
+              {val === 'Active' ? (
+                <span className=" rounded border-dark-purple bg-dark-purple/30 p-1 text-dark-purple">
+                  {val}
+                </span>
+              ) : (
+                <span className=" rounded border-light-yellow bg-light-yellow/30 p-1 text-light-yellow">
+                  {val}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         accessorKey: 'actions',
         header: 'actions',
         enableColumnFilter: false,
         cell: ({ row }) => {
+          const { index, original } = row ?? {};
           return (
             <div className="flex gap-6">
               <div
                 onClick={() =>
-                  handleDelete({ ind: row.index, _id: row.original?._id })
+                  handleStatusUpdate({ ind: index, _id: original?._id })
                 }
-                className=" flex cursor-pointer gap-x-1 p-4 pl-0"
+                className=" flex cursor-pointer gap-x-1 p-4 px-2 pl-0"
               >
-                <TrashIcon className=" h-4 w-4 text-dark-purple" />
+                {original?.status === 'ACTIVE' ? (
+                  <PauseIcon className=" h-5 w-5 text-dark-purple" />
+                ) : (
+                  <PlayIcon className=" h-5 w-5 text-dark-purple" />
+                )}
               </div>
+
               <div
-                onClick={() => handelEdit(row.original)}
-                className=" flex cursor-pointer gap-x-1 p-4"
+                onClick={() => handelEdit(original)}
+                className=" flex cursor-pointer gap-x-1 p-4 px-2"
               >
                 <PencilIcon className=" h-4 w-4 text-dark-purple" />
+              </div>
+              <div
+                onClick={() => handleDelete({ ind: index, _id: original?._id })}
+                className=" flex cursor-pointer gap-x-1 p-4 px-2 pl-0"
+              >
+                <TrashIcon className=" h-4 w-4 text-dark-purple" />
               </div>
             </div>
           );
@@ -176,10 +241,17 @@ export default function AddCreative() {
           />
 
           <ConfirmationModal
-            isOpen={confirmModal}
-            onCancel={() => setConfirmModal(false)}
+            isOpen={deleteConfirm}
+            onCancel={() => setDeleteConfirm(false)}
             onConfirm={handelConfirm}
-            title="Are you sure!"
+            title="Are you sure to delete!"
+          />
+
+          <ConfirmationModal
+            isOpen={statusConfirm}
+            onCancel={() => setStatusConfirm(false)}
+            onConfirm={handelStatusConfirm}
+            title="Are you sure update status!"
           />
         </div>
       </div>

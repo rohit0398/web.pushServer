@@ -224,6 +224,7 @@ export function CreateCampaign({
       else await api.post('/campaign', raw);
       toast.success('Campaign created successfully');
       setLoading(false);
+      handleCancelCreate();
     } catch (_err) {
       toast.error(wentWrong);
     }

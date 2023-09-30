@@ -134,7 +134,7 @@ export default function Feeds() {
         enableColumnFilter: false,
       },
       {
-        accessorKey: 'subscriptions',
+        accessorKey: 'count',
         header: 'Active subscriptions',
         enableColumnFilter: false,
       },
