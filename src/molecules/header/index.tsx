@@ -1,4 +1,5 @@
 import {
+  ArrowRightOnRectangleIcon,
   Bars3Icon,
   BellIcon,
   ChartPieIcon,
@@ -7,18 +8,27 @@ import {
   PhotoIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { CustomLink } from '@/atoms';
 import { useWindowDimensions } from '@/hooks/use-window-dimensions';
+import { useAuth } from '@/hooks/useAuth';
 
 export function Header() {
+  const { push } = useRouter();
+  const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const isLarge = useWindowDimensions()?.innerWidth > 640;
 
   const toggleSidebar = () => {
     setIsOpen((bool) => !bool);
   };
+
+  function handleLogout() {
+    localStorage.clear();
+    push('/');
+  }
 
   const navs = [
     { name: 'Dashboard', icon: <ChartPieIcon className="mr-1.5 h-6 w-6" /> },
@@ -63,6 +73,15 @@ export function Header() {
               </CustomLink>
             </li>
           ))}
+          {token && (
+            <li
+              onClick={handleLogout}
+              className=" flex cursor-pointer gap-1.5 text-center text-base font-semibold text-white"
+            >
+              <ArrowRightOnRectangleIcon className="mr-1.5 h-6 w-6" />
+              {isOpen && <span>Logout </span>}
+            </li>
+          )}
         </ul>
       )}
     </div>

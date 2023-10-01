@@ -17,6 +17,7 @@ import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import { CreateCreative } from '@/molecules/createCreative';
+import ProtectedRoute from '@/molecules/protected';
 import api from '@/utils/api';
 import { wentWrong } from '@/utils/helper';
 
@@ -220,41 +221,43 @@ export default function AddCreative() {
   );
 
   return (
-    <Layout>
-      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
-        <div className=" rounded-2xl bg-white p-3 sm:p-10">
-          {loading && <Loader />}
-          <div className=" mb-8 flex justify-between">
-            <div className=" text-3xl font-semibold text-gray">Creative</div>
+    <ProtectedRoute>
+      <Layout>
+        <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+          <div className=" rounded-2xl bg-white p-3 sm:p-10">
+            {loading && <Loader />}
+            <div className=" mb-8 flex justify-between">
+              <div className=" text-3xl font-semibold text-gray">Creative</div>
+            </div>
+
+            <CustomTable columns={columns} data={data} />
+
+            <CreateCreative
+              singleRowData={singleRowData}
+              show={showModal}
+              setShow={(bool) => {
+                setShowModal(bool);
+                setSingleRowData({});
+              }}
+              campaignId={singleRowData?.campaignId}
+            />
+
+            <ConfirmationModal
+              isOpen={deleteConfirm}
+              onCancel={() => setDeleteConfirm(false)}
+              onConfirm={handelConfirm}
+              title="Are you sure to delete!"
+            />
+
+            <ConfirmationModal
+              isOpen={statusConfirm}
+              onCancel={() => setStatusConfirm(false)}
+              onConfirm={handelStatusConfirm}
+              title="Are you sure update status!"
+            />
           </div>
-
-          <CustomTable columns={columns} data={data} />
-
-          <CreateCreative
-            singleRowData={singleRowData}
-            show={showModal}
-            setShow={(bool) => {
-              setShowModal(bool);
-              setSingleRowData({});
-            }}
-            campaignId={singleRowData?.campaignId}
-          />
-
-          <ConfirmationModal
-            isOpen={deleteConfirm}
-            onCancel={() => setDeleteConfirm(false)}
-            onConfirm={handelConfirm}
-            title="Are you sure to delete!"
-          />
-
-          <ConfirmationModal
-            isOpen={statusConfirm}
-            onCancel={() => setStatusConfirm(false)}
-            onConfirm={handelStatusConfirm}
-            title="Are you sure update status!"
-          />
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ProtectedRoute>
   );
 }

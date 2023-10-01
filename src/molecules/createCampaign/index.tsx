@@ -135,13 +135,13 @@ export function CreateCampaign({
   }
 
   function fetchCreatives() {
-    return api.get('/creative').then((res) => {
+    return api.get('/creative?status=ACTIVE').then((res) => {
       if (Array.isArray(res?.data)) setCreatives(res?.data);
     });
   }
 
   function fetchCampaignCreatives(_id: string) {
-    return api.get(`/creative?campaignId=${_id}`).then((res) => {
+    return api.get(`/creative?campaignId=${_id}&status=ACTIVE`).then((res) => {
       if (Array.isArray(res?.data)) setCampaignCreatives(res?.data);
     });
   }

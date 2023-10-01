@@ -1,5 +1,6 @@
 /* eslint-disable func-names */
 /* eslint-disable no-param-reassign */
+/* eslint-disable prefer-promise-reject-errors */
 import axios from 'axios';
 
 if (!process.env.NEXT_PUBLIC_API_URL) {
@@ -28,8 +29,13 @@ api.interceptors.response.use(
     return { status: response.status, ...response.data }; // Return the response data
   },
   function (error) {
+    if (error?.response?.status === 401) {
+      localStorage?.clear();
+    }
+
     // Handle any error that occurred during the request
-    return Promise.reject(error);
+    const data = error?.response.data ?? {};
+    return Promise.reject({ status: error?.response?.status, ...data });
   },
 );
 

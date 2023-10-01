@@ -9,6 +9,7 @@ import { Button, InputField, Loader } from '@/atoms';
 import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
+import ProtectedRoute from '@/molecules/protected';
 import api from '@/utils/api';
 import {
   serviceWorkerStr,
@@ -168,157 +169,164 @@ export default function Feeds() {
   );
 
   return (
-    <Layout>
-      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
-        <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
-          {loading && <Loader />}
-          <div className=" mb-8 flex justify-between">
-            <h2 className="text-3xl font-semibold text-gray">Feeds</h2>
-            <Button
-              title="Create"
-              onClick={() => {
-                setCreate(true);
-              }}
-            />
-          </div>
-          <div>
-            <CustomTable columns={columns} data={data} />
-          </div>
-
-          <div
-            className={`absolute inset-x-0 top-0 bg-white p-3 sm:p-10 ${
-              create ? 'absolute z-20' : ' -z-20'
-            }`}
-          >
-            <div className=" flex justify-between">
-              <h2 className="text-3xl font-semibold text-gray">Create Feed</h2>
-
+    <ProtectedRoute>
+      <Layout>
+        <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+          <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
+            {loading && <Loader />}
+            <div className=" mb-8 flex justify-between">
+              <h2 className="text-3xl font-semibold text-gray">Feeds</h2>
               <Button
-                title="Cancel"
-                variant="out-lined"
-                onClick={handleCancelCreate}
+                title="Create"
+                onClick={() => {
+                  setCreate(true);
+                }}
               />
             </div>
-            <form className="mt-4 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex flex-col gap-5">
-                <InputField
-                  label="Title"
-                  name="title"
-                  type="text"
-                  placeholder="Type here"
-                  register={register}
-                  formState={formState}
-                  rules={{
-                    required: 'This is a required field.',
-                  }}
-                />
-                <InputField
-                  label="Description"
-                  name="description"
-                  type="text"
-                  placeholder="Type here"
-                  register={register}
-                  formState={formState}
-                />
-                <InputField
-                  label="Postback URL"
-                  name="postbackUrl"
-                  type="text"
-                  placeholder="Type here"
-                  register={register}
-                  formState={formState}
-                  rules={{
-                    required: 'This is a required field.',
-                  }}
-                />
-                <InputField
-                  label="Frequency"
-                  name="frequency"
-                  type="number"
-                  placeholder="0"
-                  defaultValue={0}
-                  register={register}
-                  formState={formState}
-                  rules={{
-                    required: 'This is a required field.',
-                  }}
-                />
+            <div>
+              <CustomTable columns={columns} data={data} />
+            </div>
 
-                <InputField
-                  label={`Redirect URL when a user clicks "Allow"`}
-                  name="allowRedirectUrl"
-                  type="text"
-                  placeholder="https://domainname.com/someurl.php"
-                  register={register}
-                  formState={formState}
-                />
+            <div
+              className={`absolute inset-x-0 top-0 bg-white p-3 sm:p-10 ${
+                create ? 'absolute z-20' : ' -z-20'
+              }`}
+            >
+              <div className=" flex justify-between">
+                <h2 className="text-3xl font-semibold text-gray">
+                  Create Feed
+                </h2>
 
-                <InputField
-                  label={`Redirect URL when a user clicks "Block" or if there is no support for push notifications`}
-                  name="blockRedirectUrl"
-                  type="text"
-                  placeholder="https://domainname.com/someurl.php"
-                  register={register}
-                  formState={formState}
+                <Button
+                  title="Cancel"
+                  variant="out-lined"
+                  onClick={handleCancelCreate}
                 />
               </div>
+              <form
+                className="mt-4 space-y-6"
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <div className="flex flex-col gap-5">
+                  <InputField
+                    label="Title"
+                    name="title"
+                    type="text"
+                    placeholder="Type here"
+                    register={register}
+                    formState={formState}
+                    rules={{
+                      required: 'This is a required field.',
+                    }}
+                  />
+                  <InputField
+                    label="Description"
+                    name="description"
+                    type="text"
+                    placeholder="Type here"
+                    register={register}
+                    formState={formState}
+                  />
+                  <InputField
+                    label="Postback URL"
+                    name="postbackUrl"
+                    type="text"
+                    placeholder="Type here"
+                    register={register}
+                    formState={formState}
+                    rules={{
+                      required: 'This is a required field.',
+                    }}
+                  />
+                  <InputField
+                    label="Frequency"
+                    name="frequency"
+                    type="number"
+                    placeholder="0"
+                    defaultValue={0}
+                    register={register}
+                    formState={formState}
+                    rules={{
+                      required: 'This is a required field.',
+                    }}
+                  />
 
-              <div className=" mt-8 grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
-                <div>
-                  <Button
-                    type={'submit'}
-                    title={scriptToCopy ? 'Update' : 'Save'}
+                  <InputField
+                    label={`Redirect URL when a user clicks "Allow"`}
+                    name="allowRedirectUrl"
+                    type="text"
+                    placeholder="https://domainname.com/someurl.php"
+                    register={register}
+                    formState={formState}
+                  />
+
+                  <InputField
+                    label={`Redirect URL when a user clicks "Block" or if there is no support for push notifications`}
+                    name="blockRedirectUrl"
+                    type="text"
+                    placeholder="https://domainname.com/someurl.php"
+                    register={register}
+                    formState={formState}
                   />
                 </div>
-                {scriptToCopy && (
-                  <div className="">
-                    <div>
-                      {`Copy and paste this code in index.html for relative file`}
-                    </div>
-                    <textarea
-                      contentEditable={false}
-                      value={scriptToCopy}
-                      readOnly
-                      className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
-                    />
 
+                <div className=" mt-8 grid grid-cols-1 justify-between gap-4 md:grid-cols-2">
+                  <div>
                     <Button
-                      onClick={handleCopyToClipboard}
-                      variant="out-lined"
-                      title="Copy Script To Clipboard"
+                      type={'submit'}
+                      title={scriptToCopy ? 'Update' : 'Save'}
                     />
-
-                    <div className=" mt-10">
+                  </div>
+                  {scriptToCopy && (
+                    <div className="">
                       <div>
-                        {`Create file "serviceWorker.js" in your public folder or
-                        root directory and paste this code.`}
+                        {`Copy and paste this code in index.html for relative file`}
                       </div>
                       <textarea
                         contentEditable={false}
-                        value={serviceWorkerStr}
+                        value={scriptToCopy}
                         readOnly
                         className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
                       />
-                    </div>
-                    <Button
-                      onClick={handleCopyToClipboard2}
-                      variant="out-lined"
-                      title="Copy Script To Clipboard"
-                    />
-                  </div>
-                )}
-              </div>
-            </form>
 
-            <ConfirmationModal
-              isOpen={openConfirmationModal}
-              onCancel={() => setOpenConfirmationModal(false)}
-              onConfirm={handelConfirm}
-              title="Are you sure!"
-            />
+                      <Button
+                        onClick={handleCopyToClipboard}
+                        variant="out-lined"
+                        title="Copy Script To Clipboard"
+                      />
+
+                      <div className=" mt-10">
+                        <div>
+                          {`Create file "serviceWorker.js" in your public folder or
+                        root directory and paste this code.`}
+                        </div>
+                        <textarea
+                          contentEditable={false}
+                          value={serviceWorkerStr}
+                          readOnly
+                          className="h-32 w-full cursor-not-allowed rounded border border-stroke-gray bg-stroke-light-gray p-2 outline-none"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleCopyToClipboard2}
+                        variant="out-lined"
+                        title="Copy Script To Clipboard"
+                      />
+                    </div>
+                  )}
+                </div>
+              </form>
+
+              <ConfirmationModal
+                isOpen={openConfirmationModal}
+                onCancel={() => setOpenConfirmationModal(false)}
+                onConfirm={handelConfirm}
+                title="Are you sure!"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ProtectedRoute>
   );
 }

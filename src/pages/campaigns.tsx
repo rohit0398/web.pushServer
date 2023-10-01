@@ -15,6 +15,7 @@ import ConfirmationModal from '@/atoms/confirmationModal';
 import { CustomTable } from '@/atoms/table/table';
 import { Layout } from '@/layouts';
 import { CreateCampaign } from '@/molecules/createCampaign';
+import ProtectedRoute from '@/molecules/protected';
 import api from '@/utils/api';
 import { wentWrong } from '@/utils/helper';
 
@@ -207,41 +208,43 @@ export default function Campaign() {
   );
 
   return (
-    <Layout>
-      <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
-        <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
-          {loading && <Loader />}
-          <div className=" mb-8 flex justify-between">
-            <h2 className="text-3xl font-semibold text-gray">Campaign</h2>
+    <ProtectedRoute>
+      <Layout>
+        <div className=" mb-5 h-full w-full overflow-y-auto bg-stroke-light-gray p-3 pb-10 sm:p-10">
+          <div className=" relative rounded-2xl bg-white p-3 sm:p-10">
+            {loading && <Loader />}
+            <div className=" mb-8 flex justify-between">
+              <h2 className="text-3xl font-semibold text-gray">Campaign</h2>
 
-            <Button title="create" onClick={() => setCreate(true)} />
-          </div>
-          <div>
-            <CustomTable columns={columns} data={data} />
-          </div>
-          {create && (
-            <CreateCampaign
-              singleRowData={singleRowData}
-              setCreate={(bool) => {
-                setCreate(bool);
-                setSingleRowData({});
-              }}
+              <Button title="create" onClick={() => setCreate(true)} />
+            </div>
+            <div>
+              <CustomTable columns={columns} data={data} />
+            </div>
+            {create && (
+              <CreateCampaign
+                singleRowData={singleRowData}
+                setCreate={(bool) => {
+                  setCreate(bool);
+                  setSingleRowData({});
+                }}
+              />
+            )}
+            <ConfirmationModal
+              isOpen={deleteConfrim}
+              onCancel={() => setDeleteConfrim(false)}
+              onConfirm={handelConfirm}
+              title="Are you sure to delete!"
             />
-          )}
-          <ConfirmationModal
-            isOpen={deleteConfrim}
-            onCancel={() => setDeleteConfrim(false)}
-            onConfirm={handelConfirm}
-            title="Are you sure to delete!"
-          />
-          <ConfirmationModal
-            isOpen={statusConfirm}
-            onCancel={() => setStatusConfirm(false)}
-            onConfirm={handelStatusConfirm}
-            title="Are you sure to update status!"
-          />
+            <ConfirmationModal
+              isOpen={statusConfirm}
+              onCancel={() => setStatusConfirm(false)}
+              onConfirm={handelStatusConfirm}
+              title="Are you sure to update status!"
+            />
+          </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ProtectedRoute>
   );
 }

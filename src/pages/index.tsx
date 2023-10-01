@@ -1,9 +1,13 @@
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { Button, InputField } from '@/atoms';
+import { useAuth } from '@/hooks/useAuth';
 import { Layout } from '@/layouts';
+import api from '@/utils/api';
+import { wentWrong } from '@/utils/helper';
 
 export default function Login() {
   const { register, handleSubmit, formState } = useForm<FormData>({
@@ -11,11 +15,24 @@ export default function Login() {
   });
 
   const { push } = useRouter();
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (token) push('/dashboard');
+  }, [token]);
 
   const onSubmit = (data: any) => {
     const { email, password } = data;
-    if (email === 'admin.pushserver@gmail.com' && password === '123456')
-      push('/dashboard');
+    if (email && password)
+      api
+        .post('user/sign-in', { email, password })
+        .then((res) => {
+          localStorage.setItem('token', res?.data?.token);
+          push('/dashboard');
+        })
+        .catch((err) => {
+          toast.error(err?.message ?? wentWrong);
+        });
     else toast.error('Please use correct credentials!');
   };
 
