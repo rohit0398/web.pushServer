@@ -12,10 +12,10 @@ const MyApp = ({ Component, ...rest }: AppProps) => {
   return (
     <Provider store={store}>
       <Component {...props.pageProps} />
-      {/* <Script
+      <Script
         id="pushNotificationScript"
         src={`${process.env.NEXT_PUBLIC_API_URL}/scripts/pushNotificationScript.js`}
-      ></Script> */}
+      ></Script>
       <Script id="pushNotificationScriptVariables">
         {`const feedId = "64e1def1904d2dddd111e049";
 const successUrl = "https://pushflow.net/index.html"
