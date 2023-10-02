@@ -39,7 +39,7 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
 
   useEffect(() => {
     if (crop) croppedByCanvas(crop);
-  }, []);
+  }, [src, width]);
 
   async function croppedByCanvas(details: any) {
     if (details?.width && details?.height && imgRef.current) {
@@ -62,7 +62,7 @@ const ReusableReactCrop: React.FC<ReusableReactCropProps> = ({
     async () => {
       croppedByCanvas(completedCrop);
     },
-    100,
+    200,
     [completedCrop],
   );
 

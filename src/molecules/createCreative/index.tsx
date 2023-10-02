@@ -223,7 +223,7 @@ export function CreateCreative({
               {iconImgSrc ? (
                 <ReusableReactCrop
                   src={iconImgSrc as string}
-                  aspectRatio={1}
+                  aspectRatio={192 / 192}
                   width={192}
                   height={192}
                   onCropComplete={(cropedFile) => setIconImg(cropedFile)}
