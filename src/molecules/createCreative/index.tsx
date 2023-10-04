@@ -318,7 +318,7 @@ export function CreateCreative({
                   }}
                 />
                 <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
-                  {String('{city},{regionName}')}
+                  {'same as for URL'}
                 </span>
               </div>
 
@@ -331,7 +331,7 @@ export function CreateCreative({
                   formState={formState}
                 />
                 <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
-                  {String('{city},{regionName}')}
+                  {'same as for URL'}
                 </span>
               </div>
 
@@ -349,7 +349,7 @@ export function CreateCreative({
                 <span className=" mr-auto place-self-start self-start text-left text-sm text-light-gray">
                   <div>Available macros:</div>
                   {String(
-                    '{externalId}{campaignId}{creativeId}{subscriptionId}{days}{feedId}{clickid}{t1}{t2}{t3}{t4}{t5}{uid}{title}{body}{previewImgName}{bodyImgName}',
+                    '{campaignId}{creativeId}{subscriptionId}{days}{feedId}{clickid}{t1}{t2}{t3}{t4}{t5}{t6}{t7}{t8}{t9}{t10}{title}{body}{previewImgName}{bodyImgName}',
                   )}
                 </span>
               </div>
