@@ -126,14 +126,14 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <div className=" font-semibold text-light-gray">
                     Shown in the last 14 days
                   </div>
                   <div className=" text-base font-semibold">
                     {campaigns?.last14days?.shown ?? 0}
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   <div className=" font-semibold text-light-gray">
@@ -144,14 +144,14 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <div className=" font-semibold text-light-gray">
                     Closed in the last 14 days
                   </div>
                   <div className=" text-base font-semibold">
                     {campaigns?.last14days?.closed ?? 0}
                   </div>
-                </div>
+                </div> */}
               </div>
               <div className=" mt-10 h-96 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -175,8 +175,8 @@ export default function Dashboard() {
                     {/* <Bar dataKey="Leads" fill="#82ca9d" /> */}
                     <Bar dataKey="clicked" fill="#ffc658" />
 
-                    <Bar dataKey="closed" fill="#fa2070" />
-                    <Bar dataKey="shown" fill="#fa0aea" />
+                    {/* <Bar dataKey="closed" fill="#fa2070" /> */}
+                    {/* <Bar dataKey="shown" fill="#fa0aea" /> */}
                     <Bar dataKey="sent" fill="#00d0f5" />
                   </BarChart>
                 </ResponsiveContainer>

@@ -37,34 +37,34 @@ self.addEventListener("notificationclick", (e) => {
     }).catch(() => console.log("Click Analytics failed"));
 });
 
-self.addEventListener("notificationdisplay", (event) => {
-  console.log("notificationdisplay", event);
-  if (event?.notification?.data?.campaignId)
-    fetch("https://api.vibesender.com/api/v1/analytics/campaign", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        campaignId: event?.notification?.data?.campaignId,
-        type: "SHOWN",
-      }),
-    }).catch(() => console.log("Click Analytics failed"));
-  // Log the event or send data to your server
-});
+// self.addEventListener("notificationdisplay", (event) => {
+//   console.log("notificationdisplay", event);
+//   if (event?.notification?.data?.campaignId)
+//     fetch("https://api.vibesender.com/api/v1/analytics/campaign", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         campaignId: event?.notification?.data?.campaignId,
+//         type: "SHOWN",
+//       }),
+//     }).catch(() => console.log("Click Analytics failed"));
+//   // Log the event or send data to your server
+// });
 
-self.addEventListener("notificationclose", (event) => {
-  console.log("notificationclose", event);
-  if (event?.notification?.data?.campaignId)
-    fetch("https://api.vibesender.com/api/v1/analytics/campaign", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        campaignId: event?.notification?.data?.campaignId,
-        type: "CLOSED",
-      }),
-    }).catch(() => console.log("Closed Analytics failed"));
-  // Handle notification close event, e.g., log the event
-});
+// self.addEventListener("notificationclose", (event) => {
+//   console.log("notificationclose", event);
+//   if (event?.notification?.data?.campaignId)
+//     fetch("https://api.vibesender.com/api/v1/analytics/campaign", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         campaignId: event?.notification?.data?.campaignId,
+//         type: "CLOSED",
+//       }),
+//     }).catch(() => console.log("Closed Analytics failed"));
+//   // Handle notification close event, e.g., log the event
+// });
